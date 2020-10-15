@@ -1,5 +1,6 @@
 #include "ModuleTaskManager.h"
 
+// by Oriol Capdevila and Christian Martínez
 
 void ModuleTaskManager::threadMain()
 {
@@ -48,7 +49,7 @@ bool ModuleTaskManager::update()
 	// TODO 4: Dispatch all finished tasks to their owner module (use Module::onTaskFinished() callback)
 	std::unique_lock<std::mutex> lock(mtx);
 	while (!finishedTasks.empty()) {
-		auto task = finishedTasks.front();
+		Task* task = finishedTasks.front();
 		finishedTasks.pop();
 		task->owner->onTaskFinished(task);
 	}
