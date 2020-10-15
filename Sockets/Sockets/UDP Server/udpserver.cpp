@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <chrono>
+#include <string>
 
 void printWSError(const char* msg)
 {
@@ -22,20 +24,9 @@ void printWSError(const char* msg)
 	LocalFree(s);
 }
 
-int CleanUp()
-{
-	int iResult = WSACleanup();
-	if (iResult != NO_ERROR) {
-		printWSError("CANNOT CLEAN UP CLIENT");
-		return -1;
-	}
-
-	return 0;
-}
-
 int main(int argc, char** argv) {
 	std::cout << "UDP Client" << std::endl;
-	for (int i = 0; i < argc; ++i)
+	for (int i = 1; i < argc; ++i)
 		std::cout << "argc " << i << " argv " << argv[i] << std::endl;
 
 	WSADATA wsaData;
@@ -50,7 +41,7 @@ int main(int argc, char** argv) {
 
 		sockaddr_in remoteAddr;
 		remoteAddr.sin_family = AF_INET;
-		remoteAddr.sin_port = htons(8888);
+		remoteAddr.sin_port = htons(8000);
 		remoteAddr.sin_addr.S_un.S_addr = INADDR_ANY;
 
 		std::cout << "SOCKET SERVER CREATED" << std::endl;
@@ -69,20 +60,14 @@ int main(int argc, char** argv) {
 
 		while (loop) {
 			memset(buf, '\0', 32);
-			if (recvfrom(s, buf, 32, 0, (struct sockaddr*)&sockAddr, &len) != SOCKET_ERROR) {
-				printf("Received packet from %s:%d\n", inet_ntoa(sockAddr.sin_addr), ntohs(sockAddr.sin_port));
-				printf("Data: %s\n", buf);
+			if (recvfrom(s, buf, 32, 0, (struct sockaddr*)&sockAddr, &len) == SOCKET_ERROR) {
+				std::cout << "Error on recvfrom()" << std::endl;
+				break;
 			}
-
-			/*if ((recv_len = recvfrom(s, buf, 32, 0, (struct sockaddr*)&sockAddr, &len)) == SOCKET_ERROR)
-			{
-				printf("recvfrom() failed with error code : %d", WSAGetLastError());
-				exit(EXIT_FAILURE);
-			}
-
-			//print details of the client/peer and the data received
 			printf("Received packet from %s:%d\n", inet_ntoa(sockAddr.sin_addr), ntohs(sockAddr.sin_port));
-			printf("Data: %s\n", buf);*/
+			long long now = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count();
+			long long start = std::stoll(buf);
+			std::cout << "ping: " << (now - start) * 0.001f << "ms" << std::endl;
 		}
 
 		std::cout << "Cleaning up the socket..." << std::endl;
@@ -92,8 +77,10 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	int retval = CleanUp();
+	iResult = WSACleanup();
+	if (iResult != NO_ERROR) {
+		printWSError("CANNOT CLEAN UP CLIENT");
+	}
 
-	system("pause");
-	return retval;
+	return iResult;
 }
