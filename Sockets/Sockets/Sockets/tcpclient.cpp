@@ -6,12 +6,10 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include <chrono>
-#include <string>
 
-#include "../UDP Server/globals.h"
+//#include "../UDP Server/globals.h"
 
-int UDPClient(int argc, char** argv) {
+int TCPClient(int argc, char** argv) {
 	std::cout << "UDP Client" << std::endl;
 	for (int i = 1; i < argc; ++i)
 		std::cout << "argc " << i << " argv " << argv[i] << std::endl;
@@ -19,13 +17,16 @@ int UDPClient(int argc, char** argv) {
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != NO_ERROR) {
-		printWSError("CANNOT INITIALIZE CLIENT");
+		//printWSError("CANNOT INITIALIZE CLIENT");
+		std::cout << "CANNOT INITIALIZE CLIENT" << std::endl;
 		return -1;
 	}
 
-	SOCKET s = socket(AF_INET, SOCK_DGRAM, 0);
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == INVALID_SOCKET) {
-		printWSError("CANNOT CREATE THE SOCKET");
+		//printWSError("CANNOT CREATE THE SOCKET");
+		std::cout << "CANNOT CREATE THE SOCKET" << std::endl;
+		return -1;
 	}
 
 	sockaddr_in binAddr;
@@ -33,26 +34,37 @@ int UDPClient(int argc, char** argv) {
 	binAddr.sin_port = htons(8000);
 	inet_pton(AF_INET, "127.0.0.1", &binAddr.sin_addr);
 
+	int res = connect(s, (const sockaddr*)&binAddr, sizeof(binAddr));
+
+	if (res == SOCKET_ERROR) {
+		//printWSError("CANNOT CONNECT");
+		std::cout << "CANNOT CONNECT" << std::endl;
+		return -1;
+	}
+
 	std::cout << "SOCKET CLIENT CREATED" << std::endl;
 
 	for (int i = 0; i < 5; ++i) {
 		std::cout << "Press any key to calculate ping to server" << std::endl;
 		system("pause");
-		std::string time = std::to_string(std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count());
-		if (sendto(s, time.c_str(), time.length(), 0, (const sockaddr*)&binAddr, sizeof(binAddr)) == SOCKET_ERROR) {
-			printWSError("CANNOT SENDTO");
+		std::string time = "time";
+		if (send(s, time.c_str(), time.length(), 0) == SOCKET_ERROR) {
+			//printWSError("CANNOT SENDTO");
+			std::cout << "CANNOT SENDTO" << std::endl;
 		}
 	}
 
 	std::cout << "Cleaning up the socket..." << std::endl;
 
 	if (closesocket(s) == -1) {
-		printWSError("CANNOT INITIALIZE CLIENT");
+		//printWSError("CANNOT INITIALIZE CLIENT");
+		std::cout << "CANNOT INITIALIZE CLIENT" << std::endl;
 	}
 
 	iResult = WSACleanup();
 	if (iResult != NO_ERROR) {
-		printWSError("CANNOT CLEAN UP CLIENT");
+		//printWSError("CANNOT CLEAN UP CLIENT");
+		std::cout << "CANNOT CLEAN UP CLIENT" << std::endl;
 	}
 
 	return iResult;

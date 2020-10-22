@@ -1,3 +1,5 @@
+#include "server.h"
+
 #include <iostream>
 
 #define WIN32_LEAN_AND_MEAN
@@ -9,21 +11,22 @@
 #include <chrono>
 #include <string>
 
-#include "globals.h"
+//#include "globals.h"
 
-int UDPServer(int argc, char** argv) {
-	std::cout << "UDP Server" << std::endl;
+int TCPServer(int argc, char** argv) {
+	std::cout << "TCP Server" << std::endl;
 	for (int i = 1; i < argc; ++i)
 		std::cout << "argc " << i << " argv " << argv[i] << std::endl;
 
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != NO_ERROR) {
-		printWSError("CANNOT INITIALIZE SERVER");
+		//printWSError("CANNOT INITIALIZE SERVER");
+		std::cout << "Error INITIALIZE SERVER" << std::endl;
 		return -1;
 	}
 
-	SOCKET s = socket(AF_INET, SOCK_DGRAM, 0);
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s != INVALID_SOCKET) {
 
 		sockaddr_in remoteAddr;
@@ -35,7 +38,17 @@ int UDPServer(int argc, char** argv) {
 
 		int res = bind(s, (const struct sockaddr*)&remoteAddr, sizeof(remoteAddr));
 		if (res == SOCKET_ERROR) {
-			printWSError("CANNOT BIND");
+			//printWSError("CANNOT BIND");
+			std::cout << "Error BIND" << std::endl;
+			return -1;
+		}
+
+		res = listen(s, 1);
+
+		if (res == SOCKET_ERROR) {
+			//printWSError("ERROR listening");
+			std::cout << "Error listening" << std::endl;
+			return -1;
 		}
 
 		bool loop = true;
@@ -45,28 +58,36 @@ int UDPServer(int argc, char** argv) {
 
 		len = sizeof(sockAddr);
 
+		SOCKET socket = accept(s, (struct sockaddr*)&sockAddr, &len);
+
+		if (socket == INVALID_SOCKET) {
+			//printWSError("ERROR accepting");
+			std::cout << "Error accepting" << std::endl;
+			return -1;
+		}
+		system("pause");
 		while (loop) {
 			memset(buf, '\0', 32);
-			if (recvfrom(s, buf, 32, 0, (struct sockaddr*)&sockAddr, &len) == SOCKET_ERROR) {
-				std::cout << "Error on recvfrom()" << std::endl;
+			if (recv(socket, buf, 32, 0) == SOCKET_ERROR) {
+				std::cout << "Error on recv()" << std::endl;
 				break;
 			}
 			printf("Received packet from %s:%d\n", inet_ntoa(sockAddr.sin_addr), ntohs(sockAddr.sin_port));
-			long long now = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count();
-			long long start = std::stoll(buf);
-			std::cout << "ping: " << (now - start) * 0.001f << "ms" << std::endl;
+			std::cout << "ping: " << buf << std::endl;
 		}
 
 		std::cout << "Cleaning up the socket..." << std::endl;
 
 		if (closesocket(s) == -1) {
-			printWSError("CANNOT INITIALIZE SERVER");
+			//printWSError("CANNOT INITIALIZE SERVER");
+			std::cout << "Error INITIALIZE SERVER" << std::endl;
 		}
 	}
 
 	iResult = WSACleanup();
 	if (iResult != NO_ERROR) {
-		printWSError("CANNOT CLEAN UP CLIENT");
+		//printWSError("CANNOT CLEAN UP CLIENT");
+		std::cout << "Error CLEAN UP CLIENT" << std::endl;
 	}
 
 	return iResult;
