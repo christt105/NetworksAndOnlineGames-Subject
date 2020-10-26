@@ -1,5 +1,9 @@
 #include "ModuleNetworkingClient.h"
 
+/*
+	Oriol Capdevila & Christian Martínez
+*/
+
 
 bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPort, const char *pplayerName)
 {
@@ -7,9 +11,24 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 
 	// TODO(jesus): TCP connection stuff
 	// - Create the socket
+	if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+		reportError("Could not create client socket");
+		return false;
+	}
+
 	// - Create the remote address object
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_port = htons(serverPort);
+	inet_pton(AF_INET, serverAddressStr, &serverAddress.sin_addr);
+
 	// - Connect to the remote address
+	if (connect(s, (const sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
+		reportError("Could not connect to server");
+		return false;
+	}
+
 	// - Add the created socket to the managed list of sockets using addSocket()
+	addSocket(s);
 
 	// If everything was ok... change the state
 	state = ClientState::Start;
@@ -27,6 +46,9 @@ bool ModuleNetworkingClient::update()
 	if (state == ClientState::Start)
 	{
 		// TODO(jesus): Send the player name to the server
+		if (send(s, (playerName + '\0').c_str(), playerName.length() + 1, 0) == SOCKET_ERROR) {
+			reportError("Could not send the name");
+		}
 	}
 
 	return true;

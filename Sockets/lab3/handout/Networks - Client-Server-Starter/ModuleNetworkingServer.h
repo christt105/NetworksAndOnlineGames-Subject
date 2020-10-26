@@ -54,7 +54,7 @@ private:
 
 	ServerState state = ServerState::Stopped;
 
-	SOCKET listenSocket;
+	SOCKET listenSocket = INVALID_SOCKET;
 
 	struct ConnectedSocket
 	{

@@ -1,7 +1,8 @@
 #include "ModuleNetworkingServer.h"
 
-
-
+/*
+	Oriol Capdevila & Christian Martínez
+*/
 
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingServer public methods
@@ -11,10 +12,31 @@ bool ModuleNetworkingServer::start(int port)
 {
 	// TODO(jesus): TCP listen socket stuff
 	// - Create the listenSocket
+	if ((listenSocket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+		reportError("Invalid server listen socket");
+		return false;
+	}
+
 	// - Set address reuse
+	sockaddr_in remoteAddr;
+	remoteAddr.sin_family = AF_INET;
+	remoteAddr.sin_port = htons(port);
+	remoteAddr.sin_addr.S_un.S_addr = INADDR_ANY;
+
 	// - Bind the socket to a local interface
+	if (bind(listenSocket, (const struct sockaddr*)&remoteAddr, sizeof(remoteAddr)) == SOCKET_ERROR) {
+		reportError("Cannot bind listen socket");
+		return false;
+	}
+
 	// - Enter in listen mode
+	if (listen(listenSocket, SOMAXCONN) == SOCKET_ERROR) {
+		reportError("Error listen listenSocket");
+		return false;
+	}
+
 	// - Add the listenSocket to the managed list of sockets using addSocket()
+	addSocket(listenSocket);
 
 	state = ServerState::Listening;
 
