@@ -139,6 +139,10 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	case ServerMessage::ToKick:
 		onSocketDisconnected(socket);
 		break;
+	case ServerMessage::NameAlreadyUsed:
+		ELOG("Name %s already used", playerName.c_str());
+		onSocketDisconnected(socket);
+		break;
 	default:
 		chat.push_back(std::pair<ServerMessage, std::string>(m, p));
 		break;

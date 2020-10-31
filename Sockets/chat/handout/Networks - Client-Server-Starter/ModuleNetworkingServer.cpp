@@ -122,6 +122,17 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		std::string playerName;
 		packet >> playerName;
 
+		for (auto connectedSocket = connectedSockets.begin(); connectedSocket != connectedSockets.end(); ++connectedSocket) {
+			if ((*connectedSocket).playerName.compare(playerName) == 0) {
+				OutputMemoryStream p;
+				p << ServerMessage::NameAlreadyUsed;
+				p << "Name already used";
+				sendPacket(p, socket);
+				connectedSockets.erase(connectedSocket);
+				break;
+			}
+		}
+
 		for (auto& connectedSocket : connectedSockets) {
 			if (connectedSocket.socket == socket)
 				connectedSocket.playerName = playerName;
