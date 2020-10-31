@@ -102,11 +102,16 @@ bool ModuleNetworkingClient::gui()
 
 		static char buffer[MAXBUFFER] = { '\0' };
 		if (ImGui::InputText("##line", buffer, MAXBUFFER, ImGuiInputTextFlags_EnterReturnsTrue)) {
-			OutputMemoryStream packet;
-			packet << ClientMessage::Message;
-			packet << buffer;
-			chat.push_back(std::pair<ServerMessage, std::string>(ServerMessage::Text, buffer));
-			sendPacket(packet, s);
+			if (buffer[0] == '/' && (std::strcmp(buffer, "/clear") == 0 || std::strncmp(buffer, "/clear ", 7) == 0)) {
+				chat.clear();
+			}
+			else {
+				OutputMemoryStream packet;
+				packet << ClientMessage::Message;
+				packet << buffer;
+				chat.push_back(std::pair<ServerMessage, std::string>(ServerMessage::Text, std::string("You: ") + buffer));
+				sendPacket(packet, s);
+			}
 			memset(buffer, '\0', MAXBUFFER);
 			ImGui::SetKeyboardFocusHere();
 		}
@@ -143,5 +148,6 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 void ModuleNetworkingClient::onSocketDisconnected(SOCKET socket)
 {
 	state = ClientState::Stopped;
+	chat.clear();
 }
 

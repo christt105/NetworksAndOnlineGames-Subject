@@ -235,12 +235,20 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			break;
 		}
 
+		std::string player;
+		for (auto& connectedSocket : connectedSockets) {
+			if (connectedSocket.socket == socket) {
+				player = connectedSocket.playerName;
+				break;
+			}
+		}
+
 		for (auto& connectedSocket : connectedSockets) {
 			if (connectedSocket.socket == socket)
 				continue;
 			OutputMemoryStream p;
 			p << ServerMessage::Text;
-			p << msg;
+			p << player + ": " + msg;
 
 			sendPacket(p, connectedSocket.socket);
 		}
