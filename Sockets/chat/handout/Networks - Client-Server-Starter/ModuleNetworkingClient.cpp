@@ -140,6 +140,9 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	case ServerMessage::ToKick:
 		onSocketDisconnected(socket);
 		break;
+	case ServerMessage::ChangeName:
+		playerName = p;
+		break;
 	case ServerMessage::NameAlreadyUsed:
 		ELOG("Name %s already used", playerName.c_str());
 		onSocketDisconnected(socket);

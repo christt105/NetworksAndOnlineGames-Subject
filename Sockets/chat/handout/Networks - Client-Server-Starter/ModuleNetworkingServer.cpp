@@ -273,6 +273,44 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					break;
 				}
 				case Commands::CHANGE_NAME: {
+					std::string new_name = GetArgument(msg, 0);
+					std::string old_name;
+
+					if (new_name.empty()) {
+						p << ServerMessage::InvalidCommand;
+						p << "Cannot change the name, the name passed is empty";
+						sendPacket(p, socket);
+						break;
+					}
+
+					auto sckt = connectedSockets.end();
+
+					for (auto sckts = connectedSockets.begin(); sckts != connectedSockets.end(); ++sckts) {
+						if (socket == (*sckts).socket) {
+							sckt = sckts;
+							old_name = (*sckts).playerName;
+						}
+						if (new_name.compare((*sckts).playerName) == 0) {
+							p << ServerMessage::InvalidCommand;
+							p << "Cannot change name to " + new_name + ", name already used";
+							sendPacket(p, socket);
+							return;
+						}
+					}
+
+					(*sckt).playerName = new_name;
+
+					p << ServerMessage::ServerText;
+					p << old_name + " changed the name to " + new_name;
+					for (auto& connectedSocket : connectedSockets) {
+						if (connectedSocket.socket == socket) {
+							OutputMemoryStream pa;
+							pa << ServerMessage::ChangeName;
+							pa << new_name;
+							sendPacket(pa, connectedSocket.socket);
+						}
+						sendPacket(p, connectedSocket.socket);
+					}
 
 					break;
 				}
@@ -346,6 +384,8 @@ std::string ModuleNetworkingServer::GetArgument(const std::string& str, int argP
 
 	for (auto i = str.begin(); i != str.end(); ++i) {
 		if (*i == ' ') {
+			if ((*(i - 1)) == ' ')
+				continue;
 			if (record) {
 				break;
 			}

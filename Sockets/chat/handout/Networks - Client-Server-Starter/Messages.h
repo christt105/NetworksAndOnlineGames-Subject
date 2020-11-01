@@ -17,6 +17,7 @@ enum class ServerMessage
 	InvalidCommand,
 	NameAlreadyUsed,
 	Kicked,
+	ChangeName,
 	Whisper,
 	ToKick,
 	Disconnect
