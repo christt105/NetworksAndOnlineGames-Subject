@@ -25,7 +25,8 @@ private:
 		KICK,
 		LIST,
 		WHISPER,
-		CHANGE_NAME
+		CHANGE_NAME,
+		CLEAR
 	};
 
 	//////////////////////////////////////////////////////////////////////
@@ -80,9 +81,10 @@ private:
 		{Commands::LIST, "list"},
 		{Commands::KICK, "kick"},
 		{Commands::WHISPER, "whisper"},
-		{Commands::CHANGE_NAME, "change_name"}
+		{Commands::CHANGE_NAME, "change_name"},
+		{Commands::CLEAR, "clear"}
 	};
 
-	static std::string GetArgument(const std::string& str, int argPos);
+	static std::string GetArgument(const std::string& str, int argPos, bool andForward = false);
 };
 

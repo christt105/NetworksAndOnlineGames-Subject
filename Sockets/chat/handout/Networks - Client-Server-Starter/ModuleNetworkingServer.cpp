@@ -122,21 +122,26 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		std::string playerName;
 		packet >> playerName;
 
+		auto ownSocket = connectedSockets.end();
 		for (auto connectedSocket = connectedSockets.begin(); connectedSocket != connectedSockets.end(); ++connectedSocket) {
-			if ((*connectedSocket).playerName.compare(playerName) == 0) {
+			if ((*connectedSocket).socket == socket) {
+				ownSocket = connectedSocket;
+				(*connectedSocket).playerName = playerName;
+			}
+		}
+
+		for (auto connectedSocket = connectedSockets.begin(); connectedSocket != connectedSockets.end(); ++connectedSocket) {
+			if (ownSocket != connectedSocket && (*connectedSocket).playerName.compare(playerName) == 0) {
 				OutputMemoryStream p;
 				p << ServerMessage::NameAlreadyUsed;
 				p << "Name already used";
 				sendPacket(p, socket);
-				connectedSockets.erase(connectedSocket);
-				break;
+				connectedSockets.erase(ownSocket);
+				return;
 			}
 		}
 
 		for (auto& connectedSocket : connectedSockets) {
-			if (connectedSocket.socket == socket)
-				connectedSocket.playerName = playerName;
-
 			OutputMemoryStream p;
 			p << ServerMessage::Welcome;
 			if (socket == connectedSocket.socket)
@@ -233,6 +238,44 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 					break;
 				}
+				case Commands::WHISPER: {
+					std::string player_to_whisper = GetArgument(msg, 0);
+
+					if (player_to_whisper.empty()) {
+						p << ServerMessage::InvalidCommand;
+						p << "Argument 1 is empty, must be a connected player";
+						sendPacket(p, socket);
+					}
+
+					auto player_it = connectedSockets.end();
+					auto player_send = connectedSockets.end();
+
+					for (auto connectedSocket = connectedSockets.begin(); connectedSocket != connectedSockets.end(); ++connectedSocket) {
+						if (player_to_whisper.compare((*connectedSocket).playerName) == 0) {
+							player_it = connectedSocket;
+						}
+						if ((*connectedSocket).socket == socket) {
+							player_send = connectedSocket;
+						}
+					}
+
+					if (player_it != connectedSockets.end()) {
+						p << ServerMessage::Whisper;
+						p << (*player_send).playerName + " whisper to you: " + GetArgument(msg, 1, true);
+						sendPacket(p, (*player_it).socket);
+					}
+					else {
+						p << ServerMessage::InvalidCommand;
+						p << "Player " + player_to_whisper + " not found to whisper";
+						sendPacket(p, socket);
+					}
+
+					break;
+				}
+				case Commands::CHANGE_NAME: {
+
+					break;
+				}
 				default:
 					break;
 				}
@@ -294,7 +337,7 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 	}
 }
 
-std::string ModuleNetworkingServer::GetArgument(const std::string& str, int argPos)
+std::string ModuleNetworkingServer::GetArgument(const std::string& str, int argPos, bool andForward)
 {
 	std::string ret;
 
@@ -313,8 +356,18 @@ std::string ModuleNetworkingServer::GetArgument(const std::string& str, int argP
 				argn++;
 			}
 		}
-		else if (record)
-			ret += *i;
+		else if (record) {
+			if (andForward) {
+				while (i != str.end()) {
+					ret += *i;
+					++i;
+				}
+				break;
+			}
+			else {
+				ret += *i;
+			}
+		}
 	}
 
 	return ret;

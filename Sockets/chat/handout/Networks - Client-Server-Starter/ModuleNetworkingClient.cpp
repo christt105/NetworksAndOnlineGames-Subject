@@ -86,9 +86,10 @@ bool ModuleNetworkingClient::gui()
 					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.f), (*i).second.c_str());
 					break;
 				case ServerMessage::InvalidCommand:
-					ImGui::TextColored(ImVec4(1.0f, 0.f, 0.f, 1.f), "Invalid Command");
+					ImGui::TextColored(ImVec4(1.0f, 0.f, 0.f, 1.f), (*i).second.c_str());
 					break;
 				case ServerMessage::ServerText:
+				case ServerMessage::Whisper:
 					ImGui::TextColored(ImVec4(1.f, 0.f, 1.f, 1.f), (*i).second.c_str());
 					break;
 				default:
