@@ -160,7 +160,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		if (msg[0] == '/') {
 			auto it = commands.end();
 			for (auto i = commands.begin(); i != commands.end(); ++i) {
-				if (msg.find((*i).second) != std::string::npos) {
+				if (msg.find((*i).second) == 1) {
 					it = i;
 					break;
 				}
