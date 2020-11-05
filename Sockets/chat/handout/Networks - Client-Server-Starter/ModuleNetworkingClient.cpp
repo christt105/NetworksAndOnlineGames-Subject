@@ -1,4 +1,5 @@
 #include "ModuleNetworkingClient.h"
+#include "ModuleScreen.h"
 
 /*
 	Oriol Capdevila & Christian Martínez
@@ -74,7 +75,16 @@ bool ModuleNetworkingClient::gui()
 		ImVec2 texSize(400.0f, 400.0f * tex->height / tex->width);
 		ImGui::Image(tex->shaderResource, texSize);
 
+		ImGui::AlignTextToFramePadding();
 		ImGui::Text("%s connected to the server...", playerName.c_str());
+		ImGui::SameLine();
+		if (ImGui::Button("Logout")) {
+			disconnect();
+			ImGui::End();
+			chat.clear();
+			App->modScreen->swapScreensWithTransition(App->modScreen->screenGame, App->modScreen->screenMainMenu);
+			return true;
+		}
 
 		if(ImGui::BeginChild("##chat", ImVec2(ImGui::GetWindowWidth() * 0.95f, ImGui::GetWindowHeight() * 0.65f), true)) {
 			for (auto i = chat.begin(); i != chat.end(); i++) {
