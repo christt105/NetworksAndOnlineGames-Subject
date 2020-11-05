@@ -11,6 +11,7 @@ enum class ClientMessage
 
 enum class ServerMessage
 {
+	Intro,
 	Welcome,
 	Text,
 	ServerText,

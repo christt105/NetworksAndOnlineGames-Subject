@@ -143,11 +143,15 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 		for (auto& connectedSocket : connectedSockets) {
 			OutputMemoryStream p;
-			p << ServerMessage::Welcome;
-			if (socket == connectedSocket.socket)
-				p << "You";
-			else
+			if (socket == connectedSocket.socket) {
+				p << ServerMessage::Intro;
+				p << "-------- Welcome to the chat! --------\n-------- Type /help for help --------";
+			}
+			else {
+				p << ServerMessage::Welcome;
 				p << playerName;
+			}
+			
 
 			sendPacket(p, connectedSocket.socket);
 		}

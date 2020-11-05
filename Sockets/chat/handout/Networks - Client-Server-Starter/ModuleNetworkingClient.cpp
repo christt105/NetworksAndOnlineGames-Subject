@@ -102,6 +102,9 @@ bool ModuleNetworkingClient::gui()
 				case ServerMessage::Whisper:
 					ImGui::TextColored(ImVec4(1.f, 0.f, 1.f, 1.f), (*i).second.c_str());
 					break;
+				case ServerMessage::Intro:
+					ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), (*i).second.c_str());
+					break;
 				default:
 					ImGui::Text((*i).second.c_str());
 					break;
@@ -141,6 +144,9 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	packet >> p;
 	switch (m)
 	{
+	case ServerMessage::Intro:
+		chat.push_back(std::pair<ServerMessage, std::string>(m, p));
+		break;
 	case ServerMessage::Welcome:
 		chat.push_back(std::pair<ServerMessage, std::string>(m, p + " joined the party"));
 		break;
