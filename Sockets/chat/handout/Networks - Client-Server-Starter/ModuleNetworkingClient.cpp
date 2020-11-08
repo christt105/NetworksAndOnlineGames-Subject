@@ -88,27 +88,39 @@ bool ModuleNetworkingClient::gui()
 
 		if(ImGui::BeginChild("##chat", ImVec2(ImGui::GetWindowWidth() * 0.95f, ImGui::GetWindowHeight() * 0.65f), true)) {
 			for (auto i = chat.begin(); i != chat.end(); i++) {
+				bool pushed = false;
 				switch ((*i).first) {
-				
 				case ServerMessage::Disconnect:
 				case ServerMessage::Kicked:
 				case ServerMessage::Welcome:
-					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.f), (*i).second.c_str());
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
+					pushed = true;
 					break;
 				case ServerMessage::InvalidCommand:
-					ImGui::TextColored(ImVec4(1.0f, 0.f, 0.f, 1.f), (*i).second.c_str());
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.f, 0.f, 1.f));
+					pushed = true;
+					break;
+				case ServerMessage::Pokemon:
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.f, 1.f));
+					pushed = true;
 					break;
 				case ServerMessage::ServerText:
 				case ServerMessage::Whisper:
-					ImGui::TextColored(ImVec4(1.f, 0.f, 1.f, 1.f), (*i).second.c_str());
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 0.f, 1.f, 1.f));
+					pushed = true;
 					break;
 				case ServerMessage::Intro:
-					ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), (*i).second.c_str());
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+					pushed = true;
 					break;
 				default:
-					ImGui::Text((*i).second.c_str());
 					break;
 				}
+
+				ImGui::TextWrapped((*i).second.c_str());
+
+				if (pushed)
+					ImGui::PopStyleColor();
 			}
 
 			ImGui::EndChild();
@@ -157,6 +169,7 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 		onSocketDisconnected(socket);
 		break;
 	case ServerMessage::ChangeName:
+		chat.push_back(std::pair<ServerMessage, std::string>(ServerMessage::ServerText, "Changed the name " + playerName + " to " + p + " successfully"));
 		playerName = p;
 		break;
 	case ServerMessage::NameAlreadyUsed:

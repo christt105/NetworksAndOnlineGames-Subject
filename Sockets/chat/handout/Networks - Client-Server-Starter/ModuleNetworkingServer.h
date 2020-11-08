@@ -26,7 +26,9 @@ private:
 		LIST,
 		WHISPER,
 		CHANGE_NAME,
-		CLEAR
+		CLEAR,
+		CATCH,
+		POKEMON
 	};
 
 	//////////////////////////////////////////////////////////////////////
@@ -72,6 +74,7 @@ private:
 		sockaddr_in address;
 		SOCKET socket;
 		std::string playerName;
+		std::vector<std::string>pokemon;
 	};
 
 	std::vector<ConnectedSocket> connectedSockets;
@@ -82,9 +85,17 @@ private:
 		{Commands::KICK, "kick"},
 		{Commands::WHISPER, "whisper"},
 		{Commands::CHANGE_NAME, "change_name"},
-		{Commands::CLEAR, "clear"}
+		{Commands::CLEAR, "clear"},
+		{Commands::CATCH, "catch"},
+		{Commands::POKEMON, "pokemon"}
 	};
 
 	static std::string GetArgument(const std::string& str, int argPos, bool andForward = false);
+
+	//Pokemon bot
+	int msg_count = 0;
+	int msg_to_spawn_pokemon = 5;
+	std::vector<std::string>::iterator actual_pokemon;
+	std::vector<std::string> pokemon_database;
 };
 

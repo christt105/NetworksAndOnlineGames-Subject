@@ -40,6 +40,26 @@ bool ModuleNetworkingServer::start(int port)
 
 	state = ServerState::Listening;
 
+	//Pokemon
+	std::ifstream names;
+	names.open("pokemon_nameslist.txt");
+	if (names.is_open())
+	{
+		std::string line;
+		while (std::getline(names, line))
+		{
+			pokemon_database.push_back(line);
+		}
+		names.close();
+	}
+	else {
+		ELOG("FAILED TO OPEN pokemon_nameslist.txt");
+	}
+
+	actual_pokemon = pokemon_database.end();
+
+	std::srand(time(NULL));
+
 	return true;
 }
 
@@ -161,6 +181,16 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		std::string msg;
 		packet >> msg;
 
+		std::string player;
+		auto sock = connectedSockets.end();
+		for (auto connectedSocket = connectedSockets.begin(); connectedSocket != connectedSockets.end(); ++connectedSocket) {
+			if ((*connectedSocket).socket == socket) {
+				player = (*connectedSocket).playerName;
+				sock = connectedSocket;
+				break;
+			}
+		}
+
 		if (msg[0] == '/') {
 			auto it = commands.end();
 			for (auto i = commands.begin(); i != commands.end(); ++i) {
@@ -195,7 +225,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 						if ((*i).socket != socket)
 							str.append((*i).playerName);
 						else
-							str.append("You");
+							str.append((*i).playerName + "(You)");
 						if (i != connectedSockets.end() - 1)
 							str.append("\n");
 					}
@@ -313,9 +343,47 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 							pa << new_name;
 							sendPacket(pa, connectedSocket.socket);
 						}
-						sendPacket(p, connectedSocket.socket);
+						else {
+							sendPacket(p, connectedSocket.socket);
+						}
 					}
 
+					break;
+				}
+				case Commands::CATCH: {
+					if (actual_pokemon != pokemon_database.end()) {
+						std::string pokemon_name = GetArgument(msg, 0);
+						std::transform(pokemon_name.begin(), pokemon_name.end(), pokemon_name.begin(),
+							[](unsigned char c) { return std::tolower(c); });
+						if (pokemon_name.compare(*actual_pokemon) == 0) {
+							p << ServerMessage::Pokemon;
+							p << "Congratulations " + player + "! You caught a " + *actual_pokemon;
+							(*sock).pokemon.push_back(*actual_pokemon);
+							actual_pokemon = pokemon_database.end();
+							for (auto& connectedSocket : connectedSockets) {
+								sendPacket(p, connectedSocket.socket);
+							}
+						}
+						else {
+							p << ServerMessage::Pokemon;
+							p << "Wrong name";
+							for (auto& connectedSocket : connectedSockets) {
+								sendPacket(p, connectedSocket.socket);
+							}
+						}
+					}
+					break;
+				}
+				case Commands::POKEMON: {
+					if (sock != connectedSockets.end()) {
+						p << ServerMessage::Pokemon;
+						std::string list = "Your Pokemon:\n";
+						for (auto i = (*sock).pokemon.begin(); i != (*sock).pokemon.end(); ++i) {
+							list.append(*i);
+						}
+						p << list;
+						sendPacket(p, socket);
+					}
 					break;
 				}
 				default:
@@ -331,14 +399,6 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			break;
 		}
 
-		std::string player;
-		for (auto& connectedSocket : connectedSockets) {
-			if (connectedSocket.socket == socket) {
-				player = connectedSocket.playerName;
-				break;
-			}
-		}
-
 		for (auto& connectedSocket : connectedSockets) {
 			if (connectedSocket.socket == socket)
 				continue;
@@ -348,6 +408,18 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 			sendPacket(p, connectedSocket.socket);
 		}
+		if (++msg_count > msg_to_spawn_pokemon) {
+			OutputMemoryStream p;
+			p << ServerMessage::Pokemon;
+			actual_pokemon = pokemon_database.begin() + std::rand() % pokemon_database.size();
+			p << "A wild " + (*actual_pokemon) + " has appeared! Type /catch <pokemon> to catch it";
+			Sleep(30);
+			for (auto s = connectedSockets.begin(); s != connectedSockets.end(); ++s) {
+				sendPacket(p, (*s).socket);
+			}
+			msg_count = 0;
+		}
+
 		break;
 	}
 	default:

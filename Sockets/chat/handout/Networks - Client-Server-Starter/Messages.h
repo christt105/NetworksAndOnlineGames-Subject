@@ -18,6 +18,7 @@ enum class ServerMessage
 	InvalidCommand,
 	NameAlreadyUsed,
 	Kicked,
+	Pokemon,
 	ChangeName,
 	Whisper,
 	ToKick,
