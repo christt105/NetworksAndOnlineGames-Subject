@@ -62,7 +62,7 @@ bool ModuleNetworkingClient::update()
 	return true;
 }
 
-#define MAXBUFFER 50
+#define MAXBUFFER 120
 
 bool ModuleNetworkingClient::gui()
 {
