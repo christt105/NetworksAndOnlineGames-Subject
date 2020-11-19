@@ -169,7 +169,7 @@ void ModuleNetworkingClient::onUpdate()
 		secondsSinceLastPing += Time.deltaTime;
 
 		if (secondsSinceReceivedPacket > DISCONNECT_TIMEOUT_SECONDS) {
-			onDisconnect();
+			disconnect();
 		}
 
 		if (secondsSinceLastPing > PING_INTERVAL_SECONDS) {
