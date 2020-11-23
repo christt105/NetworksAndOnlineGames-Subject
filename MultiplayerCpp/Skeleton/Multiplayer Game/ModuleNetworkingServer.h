@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ModuleNetworking.h"
+#include "ReplicationManagerServer.h"
 
 class ModuleNetworkingServer : public ModuleNetworking
 {
@@ -53,7 +54,10 @@ private:
 		// TODO(you): UDP virtual connection lab session
 		float secondsSinceLastReceivedPacket = 0.f;
 		float secondsSinceLastPing = 0.f;
+		
 		// TODO(you): World state replication lab session
+		ReplicationManagerServer replication_server;
+
 		// TODO(you): Reliability on top of UDP lab session
 
 		uint32 nextExpectedInputSequenceNumber = 0;

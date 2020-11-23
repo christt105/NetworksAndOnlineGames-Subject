@@ -107,14 +107,14 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	uint32 protoId;
 	packet >> protoId;
 	if (protoId != PROTOCOL_ID) return;
-	
-	ServerMessage message;
-	packet >> message;
 
 	secondsSinceReceivedPacket = 0.f;
 
 	if (state == ClientState::Connecting)
 	{
+		ServerMessage message;
+		packet >> message;
+
 		if (message == ServerMessage::Welcome)
 		{
 			packet >> playerId;

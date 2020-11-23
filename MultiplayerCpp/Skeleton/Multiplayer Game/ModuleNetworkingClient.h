@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ModuleNetworking.h"
+#include "ReplicationManagerClient.h"
 
 class ModuleNetworkingClient : public ModuleNetworking
 {
@@ -95,7 +96,7 @@ private:
 
 	// TODO(you): World state replication lab session
 
-
+	ReplicationManagerClient replication_client;
 
 	//////////////////////////////////////////////////////////////////////
 	// Delivery manager
