@@ -40,6 +40,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 
 			if (action == ReplicationAction::Create) {
 				// TODO: read sprite bla bla??
+				gameObject->sprite = App->modRender->addSprite(gameObject);
+				gameObject->sprite->texture = App->modResources->spacecraft1;
 			}
 
 			LOG("POSX: %f", gameObject->position.x);

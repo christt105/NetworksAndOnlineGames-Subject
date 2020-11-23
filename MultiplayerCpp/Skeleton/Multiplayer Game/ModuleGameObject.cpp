@@ -18,11 +18,22 @@ bool ModuleGameObject::preUpdate()
 		GameObject::NON_EXISTING  // After DESTROYING
 	};
 
-	for (GameObject &gameObject : gameObjects)
+	static float timer = 0.f;
+	timer += 0.1f * Time.deltaTime;
+
+	for (GameObject& gameObject : gameObjects)
 	{
 		gameObject.state = gNextState[gameObject.state];
+		if (timer > 1.f) {
+			if (gameObject.networkId != 0) {
+				LOG("GameObject: tag: %i, id: %i, network: %i, spirte: %i, positionX: %f",
+					gameObject.tag, gameObject.id, gameObject.networkId, gameObject.sprite, gameObject.position.x);
+			}
+		}
 	}
-
+	if (timer > 1.f) {
+		timer = -1.f;
+	}
 	END_TIMED_BLOCK(GOPreUpdate);
 
 	return true;

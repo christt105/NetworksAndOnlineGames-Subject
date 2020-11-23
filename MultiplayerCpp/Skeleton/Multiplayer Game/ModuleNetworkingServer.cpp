@@ -143,7 +143,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 				App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
 				for (uint16 i = 0; i < networkGameObjectsCount; ++i)
 				{
-					// TODO(you): World state replication lab session (not done)
+					// TODO(you): World state replication lab session
 					GameObject *gameObject = networkGameObjects[i];
 					proxy->replication_server.create(gameObject->networkId);
 				}
@@ -243,6 +243,9 @@ void ModuleNetworkingServer::onUpdate()
 				}
 
 				// TODO(you): World state replication lab session
+				OutputMemoryStream packet;
+				clientProxy.replication_server.write(packet);
+				sendPacket(packet, clientProxy.address);
 
 				// TODO(you): Reliability on top of UDP lab session
 			}
@@ -399,6 +402,7 @@ void ModuleNetworkingServer::updateNetworkObject(GameObject * gameObject)
 		if (clientProxies[i].connected)
 		{
 			// TODO(you): World state replication lab session
+			clientProxies[i].replication_server.update(gameObject->networkId);
 		}
 	}
 }
