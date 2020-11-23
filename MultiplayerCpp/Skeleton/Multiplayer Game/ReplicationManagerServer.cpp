@@ -21,6 +21,8 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 void ReplicationManagerServer::write(OutputMemoryStream& packet)
 {
 	packet << PROTOCOL_ID;
+	packet << ClientMessage::Input;
+	packet << actions.size();
 
 	for (auto item = actions.begin(); item != actions.end();) {
 	
@@ -28,16 +30,29 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 		packet << (*item).second;
 
 		// Clear/Update states
-		if ((*item).second != ReplicationAction::Destroy) {
+		if ((*item).second == ReplicationAction::Destroy) {
+			item = actions.erase(item);
+			continue;
+		}
+		else if ((*item).second != ReplicationAction::None) {
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject((*item).first);
 
 			// TODO: save all GO fields
+			packet << gameObject->position.x;
+			packet << gameObject->position.y;
+			packet << gameObject->size.x;
+			packet << gameObject->size.y;
+			packet << gameObject->angle;
+			packet << gameObject->tag;
+			packet << gameObject->networkInterpolationEnabled;
+			packet << gameObject->state;
+
+			if ((*item).second == ReplicationAction::Create) {
+				// TODO: write sprite bla bla??
+			}
 
 			(*item).second = ReplicationAction::None;
-			++item;
 		}
-		else {
-			item = actions.erase(item);
-		}
+		++item;
 	}
 }
