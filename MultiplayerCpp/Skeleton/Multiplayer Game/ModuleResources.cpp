@@ -6,6 +6,7 @@
 void ModuleResources::TaskLoadTexture::execute()
 {
 	*texture = App->modTextures->loadTexture(filename);
+	(*texture)->id = id;
 }
 
 #endif
@@ -34,7 +35,7 @@ bool ModuleResources::init()
 	loadTextureAsync("laser.png",            &laser);
 	loadTextureAsync("explosion1.png",       &explosion1);
 #endif
-
+	
 	audioClipLaser = App->modSound->loadAudioClip("laser.wav");
 	audioClipExplosion = App->modSound->loadAudioClip("explosion.wav");
 	//App->modSound->playAudioClip(audioClipExplosion);
@@ -48,10 +49,11 @@ void ModuleResources::loadTextureAsync(const char * filename, Texture **textureP
 {
 	ASSERT(taskCount < MAX_RESOURCES);
 	
-	TaskLoadTexture *task = &tasks[taskCount++];
+	TaskLoadTexture *task = &tasks[taskCount];
 	task->owner = this;
 	task->filename = filename;
 	task->texture = texturePtrAddress;
+	task->id = taskCount++;
 
 	App->modTaskManager->scheduleTask(task, this);
 }

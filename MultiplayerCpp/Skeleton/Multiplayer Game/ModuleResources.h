@@ -37,6 +37,7 @@ private:
 
 		const char *filename = nullptr;
 		Texture **texture = nullptr;
+		int id = -1;
 
 		void execute() override;
 	};

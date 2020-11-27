@@ -74,13 +74,26 @@ public:
 		Write( inString.data(), elementCount * sizeof( char ) );
 	}
 
+	void Write(const vec4& data)
+	{
+		Write(data.x);
+		Write(data.y);
+		Write(data.z);
+		Write(data.w);
+	}
+
+	void Write(const vec2& data)
+	{
+		Write(data.x);
+		Write(data.y);
+	}
+
 	// Generic operator <<
 	template< typename T >
 	OutputMemoryStream &operator<<(const T &data) {
 		Write(data);
 		return *this;
-	}
-	
+	}	
 
 private:
 

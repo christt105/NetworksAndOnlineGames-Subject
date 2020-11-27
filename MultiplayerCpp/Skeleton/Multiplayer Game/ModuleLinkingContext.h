@@ -35,10 +35,7 @@ private:
 	uint32 nextMagicNumber = 1;
 
 	uint32 makeNetworkId(uint16 arrayIndex);
-	uint16 arrayIndexFromNetworkId(uint32 networkId);
 
-	GameObject *networkGameObjects[MAX_NETWORK_OBJECTS] = {};
-
-	uint16 networkGameObjectsCount = 0;
+	std::map<uint32, GameObject*> networkGameObjectsMap;
 };
 

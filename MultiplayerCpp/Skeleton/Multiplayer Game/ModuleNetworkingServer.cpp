@@ -388,6 +388,8 @@ GameObject * ModuleNetworkingServer::instantiateNetworkObject()
 		if (clientProxies[i].connected)
 		{
 			// TODO(you): World state replication lab session
+			clientProxies[i].replication_server.create(gameObject->networkId);
+			LOG("CREATE: %i", gameObject->networkId);
 		}
 	}
 
@@ -415,6 +417,7 @@ void ModuleNetworkingServer::destroyNetworkObject(GameObject * gameObject)
 		if (clientProxies[i].connected)
 		{
 			// TODO(you): World state replication lab session
+			clientProxies[i].replication_server.destroy(gameObject->networkId);
 		}
 	}
 

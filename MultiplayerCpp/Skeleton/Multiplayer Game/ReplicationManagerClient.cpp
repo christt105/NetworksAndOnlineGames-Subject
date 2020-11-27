@@ -23,6 +23,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			GameObject* gameObject = nullptr;
 			if (action == ReplicationAction::Update) {
 				gameObject = App->modLinkingContext->getNetworkGameObject(id);
+				if (gameObject == nullptr) {
+					gameObject = App->modGameObject->Instantiate();
+					App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject, id);
+				}
 			}
 			else {
 				gameObject = App->modGameObject->Instantiate();
@@ -40,8 +44,13 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 
 			if (action == ReplicationAction::Create) {
 				// TODO: read sprite bla bla??
-				gameObject->sprite = App->modRender->addSprite(gameObject);
-				gameObject->sprite->texture = App->modResources->spacecraft1;
+				int id = -1;
+				packet >> id;
+				if (id != -1) {
+					gameObject->sprite = App->modRender->addSprite(gameObject);
+					gameObject->sprite->texture = App->modTextures->GetTextureByID(id);
+					ASSERT(gameObject->sprite->texture != nullptr);
+				}
 			}
 
 			LOG("POSX: %f", gameObject->position.x);

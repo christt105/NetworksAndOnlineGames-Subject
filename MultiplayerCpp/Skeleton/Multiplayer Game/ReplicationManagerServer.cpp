@@ -49,6 +49,15 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 
 			if ((*item).second == ReplicationAction::Create) {
 				// TODO: write sprite bla bla??
+				if (gameObject->sprite != nullptr && gameObject->sprite->texture != nullptr) {
+					packet << gameObject->sprite->texture->id;
+					packet << gameObject->sprite->color;
+					packet << gameObject->sprite->order;
+					packet << gameObject->sprite->pivot;
+				}
+				else {
+					packet << -1;
+				}
 			}
 
 			(*item).second = ReplicationAction::None;
