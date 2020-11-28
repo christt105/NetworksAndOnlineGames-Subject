@@ -50,9 +50,13 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->sprite = App->modRender->addSprite(gameObject);
 					gameObject->sprite->texture = App->modTextures->GetTextureByID(id);
 					ASSERT(gameObject->sprite->texture != nullptr);
-					//packet.Read(&gameObject->sprite->color, sizeof(float) * 4);
-					//packet >> gameObject->sprite->order;
-					//packet.Read(&gameObject->sprite->pivot, sizeof(float) * 2);
+					packet >> gameObject->sprite->color.r;
+					packet >> gameObject->sprite->color.g;
+					packet >> gameObject->sprite->color.b;
+					packet >> gameObject->sprite->color.a;
+					packet >> gameObject->sprite->order;
+					packet >> gameObject->sprite->pivot.x;
+					packet >> gameObject->sprite->pivot.y;
 				}
 
 				BehaviourType behaviour = BehaviourType::None;

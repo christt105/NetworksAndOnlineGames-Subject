@@ -51,9 +51,9 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				// TODO: write sprite bla bla??
 				if (gameObject->sprite != nullptr && gameObject->sprite->texture != nullptr) {
 					packet << gameObject->sprite->texture->id;
-					//packet << gameObject->sprite->color;
-					//packet << gameObject->sprite->order;
-					//packet << gameObject->sprite->pivot;
+					packet.Write(gameObject->sprite->color);
+					packet << gameObject->sprite->order;
+					packet.Write(gameObject->sprite->pivot);
 				}
 				else {
 					packet << -1;
