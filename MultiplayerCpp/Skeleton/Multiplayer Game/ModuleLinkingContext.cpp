@@ -47,6 +47,8 @@ void ModuleLinkingContext::unregisterNetworkGameObject(GameObject *gameObject)
 
 void ModuleLinkingContext::clear()
 {
+	for (auto i = networkGameObjectsMap.begin(); i != networkGameObjectsMap.end(); ++i)
+		(*i).second->networkId = 0;
 	networkGameObjectsMap.clear();
 }
 

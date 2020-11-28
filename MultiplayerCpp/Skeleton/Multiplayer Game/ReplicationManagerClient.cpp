@@ -18,6 +18,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 		if (action == ReplicationAction::Destroy) {
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(id);
 			// TODO: destroy it
+			App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+			App->modGameObject->Destroy(gameObject);
 		}
 		else if (action != ReplicationAction::None) {
 			GameObject* gameObject = nullptr;
@@ -43,7 +45,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			packet >> gameObject->state;
 
 			if (action == ReplicationAction::Create) {
-				// TODO: read sprite bla bla??
 				int id = -1;
 				packet >> id;
 				if (id != -1) {

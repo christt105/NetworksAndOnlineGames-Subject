@@ -48,7 +48,6 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << gameObject->state;
 
 			if ((*item).second == ReplicationAction::Create) {
-				// TODO: write sprite bla bla??
 				if (gameObject->sprite != nullptr && gameObject->sprite->texture != nullptr) {
 					packet << gameObject->sprite->texture->id;
 					packet.Write(gameObject->sprite->color);
