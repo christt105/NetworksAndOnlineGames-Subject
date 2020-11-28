@@ -42,7 +42,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			packet >> gameObject->angle;
 			packet >> gameObject->tag;
 			packet >> gameObject->networkInterpolationEnabled;
-			packet >> gameObject->state;
 
 			if (action == ReplicationAction::Create) {
 				int id = -1;
@@ -79,7 +78,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 						gameObject->behaviour->read(packet);
 					}
 				}
-				gameObject->state = GameObject::INSTANTIATE;
 			}
 		}
 

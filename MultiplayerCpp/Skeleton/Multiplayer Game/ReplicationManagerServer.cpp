@@ -45,7 +45,6 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << gameObject->angle;
 			packet << gameObject->tag;
 			packet << gameObject->networkInterpolationEnabled;
-			packet << gameObject->state;
 
 			if ((*item).second == ReplicationAction::Create) {
 				if (gameObject->sprite != nullptr && gameObject->sprite->texture != nullptr) {
