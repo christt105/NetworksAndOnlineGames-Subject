@@ -389,7 +389,6 @@ GameObject * ModuleNetworkingServer::instantiateNetworkObject()
 		{
 			// TODO(you): World state replication lab session
 			clientProxies[i].replication_server.create(gameObject->networkId);
-			LOG("CREATE: %i", gameObject->networkId);
 		}
 	}
 

@@ -75,14 +75,12 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 						WLOG("Behaviour with type %i not in switch", behaviour);
 						break;
 					}
-					if (gameObject->behaviour != nullptr)
+					if (gameObject->behaviour != nullptr) {
 						gameObject->behaviour->read(packet);
+					}
 				}
+				gameObject->state = GameObject::INSTANTIATE;
 			}
-
-			LOG("POSX: %f", gameObject->position.x);
-			LOG("POSY: %f", gameObject->position.y);
-			LOG("TAG %i", (int)gameObject->tag); // haha it works!!
 		}
 
 	}
