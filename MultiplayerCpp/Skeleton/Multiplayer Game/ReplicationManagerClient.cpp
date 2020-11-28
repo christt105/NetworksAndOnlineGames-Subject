@@ -50,6 +50,28 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->sprite = App->modRender->addSprite(gameObject);
 					gameObject->sprite->texture = App->modTextures->GetTextureByID(id);
 					ASSERT(gameObject->sprite->texture != nullptr);
+					//packet.Read(&gameObject->sprite->color, sizeof(float) * 4);
+					//packet >> gameObject->sprite->order;
+					//packet.Read(&gameObject->sprite->pivot, sizeof(float) * 2);
+				}
+
+				BehaviourType behaviour = BehaviourType::None;
+				packet >> behaviour;
+				if (behaviour != BehaviourType::None) {
+					switch (behaviour)
+					{
+					case BehaviourType::Spaceship:
+						gameObject->behaviour = App->modBehaviour->addSpaceship(gameObject);
+						break;
+					case BehaviourType::Laser:
+						gameObject->behaviour = App->modBehaviour->addLaser(gameObject);
+						break;
+					default:
+						WLOG("Behaviour with type %i not in switch", behaviour);
+						break;
+					}
+					if (gameObject->behaviour != nullptr)
+						gameObject->behaviour->read(packet);
 				}
 			}
 
