@@ -138,19 +138,17 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		case ServerMessage::Replication: {
 			// TODO(you): World state replication lab session
 			replication_client.read(packet);
-			//inputDataFront = inputDataBack;
 			break; }
 		case ServerMessage::Ping: {
 			//TODO:? why empty
 			break; }
 		case ServerMessage::Reliability: {
+		// TODO(you): Reliability on top of UDP lab session
 			uint32 i = 0U;
 			packet >> i;
 			inputDataFront = i;
 			break; }
 		}
-
-		// TODO(you): Reliability on top of UDP lab session
 	}
 }
 

@@ -41,7 +41,7 @@ private:
 	// - The next outgoing sequence number
 	// - A list of pending deliveries
 	uint32 nextOutgoingSequenceNumber = 0u;
-	std::list<Delivery> pendingDeliveries;
+	std::list<Delivery*> pendingDeliveries;
 
 	// Private members (receiver side)
 	// - The next expected sequence number

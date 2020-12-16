@@ -83,7 +83,7 @@ void ModuleNetworkingServer::onGui()
 	}
 }
 
-void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
+void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, const sockaddr_in& fromAddress)
 {
 	if (state == ServerState::Listening)
 	{
@@ -94,9 +94,11 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 		ClientMessage message;
 		packet >> message;
 
-		ClientProxy *proxy = getClientProxy(fromAddress);
+		ClientProxy* proxy = getClientProxy(fromAddress);
 
-		if (message == ClientMessage::Hello)
+		switch (message)
+		{
+		case ClientMessage::Hello:
 		{
 			if (proxy == nullptr)
 			{
@@ -117,7 +119,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 					proxy->clientId = nextClientId++;
 
 					// Create new network object
-					vec2 initialPosition = 500.0f * vec2{ Random.next() - 0.5f, Random.next() - 0.5f};
+					vec2 initialPosition = 500.0f * vec2{ Random.next() - 0.5f, Random.next() - 0.5f };
 					float initialAngle = 360.0f * Random.next();
 					proxy->gameObject = spawnPlayer(spaceshipType, initialPosition, initialAngle);
 				}
@@ -139,15 +141,15 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 
 				// Send all network objects to the new player
 				uint16 networkGameObjectsCount;
-				GameObject *networkGameObjects[MAX_NETWORK_OBJECTS];
+				GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
 				App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
 				for (uint16 i = 0; i < networkGameObjectsCount; ++i)
 				{
 					// TODO(you): World state replication lab session
-					GameObject *gameObject = networkGameObjects[i];
+					GameObject* gameObject = networkGameObjects[i];
 					proxy->replication_server.create(gameObject->networkId);
 				}
-				
+
 				OutputMemoryStream packet;
 				proxy->replication_server.write(packet);
 				sendPacket(packet, fromAddress);
@@ -164,7 +166,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 				WLOG("Message received: UNWELCOMED hello - server is full");
 			}
 		}
-		else if (message == ClientMessage::Input)
+		break;
+		case ClientMessage::Input:
 		{
 			// Process the input packet and update the corresponding game object
 			if (proxy != nullptr && IsValid(proxy->gameObject))
@@ -198,10 +201,13 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 				sendPacket(o, fromAddress);
 			}
 		}
-
-		// TODO(you): UDP virtual connection lab session
-		else if (message == ClientMessage::Ping && proxy != nullptr) {
+		break;
+		case ClientMessage::Ping:
+			// TODO(you): UDP virtual connection lab session
 			proxy->secondsSinceLastReceivedPacket = 0.f;
+			break;
+		default:
+			break;
 		}
 	}
 }
