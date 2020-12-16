@@ -131,16 +131,22 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	}
 	else if (state == ClientState::Connected)
 	{
-		ClientMessage message;
+		ServerMessage message;
 		packet >> message;
 
 		switch (message) {
-		case ClientMessage::Input: {
+		case ServerMessage::Replication: {
 			// TODO(you): World state replication lab session
 			replication_client.read(packet);
+			//inputDataFront = inputDataBack;
 			break; }
-		case ClientMessage::Ping: {
-
+		case ServerMessage::Ping: {
+			//TODO:? why empty
+			break; }
+		case ServerMessage::Reliability: {
+			uint32 i = 0U;
+			packet >> i;
+			inputDataFront = i;
 			break; }
 		}
 
@@ -186,7 +192,7 @@ void ModuleNetworkingClient::onUpdate()
 		if (secondsSinceLastPing > PING_INTERVAL_SECONDS) {
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
-			packet << ServerMessage::Ping;
+			packet << ClientMessage::Ping;
 			sendPacket(packet, serverAddress);
 			secondsSinceLastPing = 0.f;
 		}
@@ -226,7 +232,7 @@ void ModuleNetworkingClient::onUpdate()
 			}
 
 			// Clear the queue
-			inputDataFront = inputDataBack;
+			//inputDataFront = inputDataBack;
 
 			sendPacket(packet, serverAddress);
 		}

@@ -21,7 +21,7 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 void ReplicationManagerServer::write(OutputMemoryStream& packet)
 {
 	packet << PROTOCOL_ID;
-	packet << ClientMessage::Input;
+	packet << ServerMessage::Replication;
 	packet << actions.size();
 
 	for (auto item = actions.begin(); item != actions.end();) {

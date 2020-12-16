@@ -172,10 +172,12 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 				// TODO(you): Reliability on top of UDP lab session
 
 				// Read input data
+				uint32 lastSequenceNumber = 0U;
 				while (packet.RemainingByteCount() > 0)
 				{
 					InputPacketData inputData;
 					packet >> inputData.sequenceNumber;
+					lastSequenceNumber = inputData.sequenceNumber;
 					packet >> inputData.horizontalAxis;
 					packet >> inputData.verticalAxis;
 					packet >> inputData.buttonBits;
@@ -189,6 +191,11 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
 					}
 				}
+				OutputMemoryStream o;
+				o << PROTOCOL_ID;
+				o << ServerMessage::Reliability;
+				o << lastSequenceNumber;
+				sendPacket(o, fromAddress);
 			}
 		}
 
@@ -231,7 +238,7 @@ void ModuleNetworkingServer::onUpdate()
 				if (clientProxy.secondsSinceLastPing > PING_INTERVAL_SECONDS) {
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
-					packet << ClientMessage::Ping;
+					packet << ServerMessage::Ping;
 					sendPacket(packet, clientProxy.address);
 					clientProxy.secondsSinceLastPing = 0.f;
 				}
