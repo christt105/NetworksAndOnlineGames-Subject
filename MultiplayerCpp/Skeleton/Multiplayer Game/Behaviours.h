@@ -46,6 +46,9 @@ struct Laser : public Behaviour
 
 	void start() override;
 
+	void write(OutputMemoryStream& packet) override;
+	void read(const InputMemoryStream& packet) override;
+
 	void update() override;
 };
 

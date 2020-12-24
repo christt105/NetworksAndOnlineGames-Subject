@@ -46,6 +46,14 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << gameObject->tag;
 			packet << gameObject->networkInterpolationEnabled;
 
+			if (gameObject->behaviour != nullptr) {
+				packet << gameObject->behaviour->type();
+				gameObject->behaviour->write(packet);
+			}
+			else {
+				packet << BehaviourType::None;
+			}
+
 			if ((*item).second == ReplicationAction::Create) {
 				if (gameObject->sprite != nullptr && gameObject->sprite->texture != nullptr) {
 					packet << gameObject->sprite->texture->id;
@@ -65,14 +73,6 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				}
 				else {
 					packet << -1;
-				}
-
-				if (gameObject->behaviour != nullptr) {
-					packet << gameObject->behaviour->type();
-					gameObject->behaviour->write(packet);
-				}
-				else {
-					packet << BehaviourType::None;
 				}
 			}
 
