@@ -59,6 +59,16 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					packet >> gameObject->sprite->pivot.y;
 				}
 
+				packet >> id;
+				if (id != -1) {
+					gameObject->animation = App->modRender->addAnimation(gameObject);
+					packet >> gameObject->animation->currentFrame;
+					packet >> gameObject->animation->elapsedTime;
+					uint16 clipID;
+					packet >> clipID;
+					gameObject->animation->clip = App->modRender->getAnimationClip(clipID);
+				}
+
 				BehaviourType behaviour = BehaviourType::None;
 				packet >> behaviour;
 				if (behaviour != BehaviourType::None) {
