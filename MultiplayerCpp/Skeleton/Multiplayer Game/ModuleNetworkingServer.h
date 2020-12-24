@@ -81,7 +81,7 @@ public:
 	//////////////////////////////////////////////////////////////////////
 
 	GameObject * spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle);
-
+	void spawnPowerUp();
 
 
 private:
@@ -125,10 +125,7 @@ private:
 
 	uint16 listenPort = 0;
 
-
-
 	// TODO(you): UDP virtual connection lab session
-
 };
 
 
