@@ -9,6 +9,8 @@ struct Behaviour
 	bool isServer = false;
 	bool isLocalPlayer = false;
 
+	virtual ~Behaviour() {};
+
 	virtual BehaviourType type() const = 0;
 
 	virtual void start() { }
@@ -32,6 +34,7 @@ enum class BehaviourType : uint8
 	None,
 	Spaceship,
 	Laser,
+	PowerUp
 };
 
 
@@ -44,6 +47,19 @@ struct Laser : public Behaviour
 	void start() override;
 
 	void update() override;
+};
+
+struct PowerUp : public Behaviour
+{
+	float secondsSinceCreation = 0.0f;
+
+	BehaviourType type() const override { return BehaviourType::PowerUp; }
+
+	void start() override;
+
+	void update() override;
+
+	void onCollisionTriggered(Collider& c1, Collider& c2) override;
 };
 
 

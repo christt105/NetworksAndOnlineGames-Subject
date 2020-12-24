@@ -351,6 +351,12 @@ void ModuleNetworkingServer::destroyClientProxy(ClientProxy *clientProxy)
 
 GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle)
 {
+	auto go = NetworkInstantiate();
+	go->sprite = App->modRender->addSprite(go);
+	go->sprite->texture = App->modResources->asteroid1;
+	go->behaviour = App->modBehaviour->addPowerUp(go);
+	//go->behaviour->isServer = true;
+
 	// Create a new game object with the player properties
 	GameObject *gameObject = NetworkInstantiate();
 	gameObject->position = initialPosition;

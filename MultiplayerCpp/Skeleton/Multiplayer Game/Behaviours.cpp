@@ -162,3 +162,21 @@ void Spaceship::read(const InputMemoryStream & packet)
 {
 	packet >> hitPoints;
 }
+
+void PowerUp::start()
+{
+	LOG("HOLA");
+}
+
+void PowerUp::update()
+{
+	gameObject->angle += 0.1f;
+	gameObject->position.x += 1.f;
+}
+
+void PowerUp::onCollisionTriggered(Collider& c1, Collider& c2)
+{
+	if (c2.type == ColliderType::Player) {
+		LOG("JAJAJJAJ XD");
+	}
+}

@@ -13,6 +13,11 @@ bool ModuleBehaviour::update()
 		handleBehaviourLifeCycle(&behaviour);
 	}
 
+	for (PowerUp& behaviour : powerups)
+	{
+		handleBehaviourLifeCycle(&behaviour);
+	}
+
 	return true;
 }
 
@@ -24,7 +29,10 @@ Behaviour *ModuleBehaviour::addBehaviour(BehaviourType behaviourType, GameObject
 		return addSpaceship(parentGameObject);
 	case BehaviourType::Laser:
 		return addLaser(parentGameObject);
+	case BehaviourType::PowerUp:
+		return addPowerUp(parentGameObject);
 	default:
+		WLOG("Behaviour with type %i not in switch", behaviourType);
 		return nullptr;
 	}
 }
@@ -49,6 +57,23 @@ Spaceship *ModuleBehaviour::addSpaceship(GameObject *parentGameObject)
 Laser *ModuleBehaviour::addLaser(GameObject *parentGameObject)
 {
 	for (Laser &behaviour : lasers)
+	{
+		if (behaviour.gameObject == nullptr)
+		{
+			behaviour = {};
+			behaviour.gameObject = parentGameObject;
+			parentGameObject->behaviour = &behaviour;
+			return &behaviour;
+		}
+	}
+
+	ASSERT(false);
+	return nullptr;
+}
+
+PowerUp* ModuleBehaviour::addPowerUp(GameObject* parentGameObject)
+{
+	for (PowerUp& behaviour : powerups)
 	{
 		if (behaviour.gameObject == nullptr)
 		{

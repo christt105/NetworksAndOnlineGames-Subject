@@ -8,9 +8,10 @@ public:
 
 	bool update() override;
 
-	Behaviour * addBehaviour(BehaviourType behaviourType, GameObject *parentGameObject);
-	Spaceship * addSpaceship(GameObject *parentGameObject);
-	Laser     * addLaser(GameObject *parentGameObject);
+	Behaviour	* addBehaviour(BehaviourType behaviourType, GameObject *parentGameObject);
+	Spaceship	* addSpaceship(GameObject *parentGameObject);
+	Laser		* addLaser(GameObject *parentGameObject);
+	PowerUp     * addPowerUp(GameObject *parentGameObject);
 
 private:
 
@@ -18,5 +19,6 @@ private:
 
 	Spaceship spaceships[MAX_CLIENTS];
 	Laser lasers[MAX_GAME_OBJECTS];
+	PowerUp powerups[MAX_GAME_OBJECTS/2];
 };
 

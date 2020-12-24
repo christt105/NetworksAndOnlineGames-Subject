@@ -62,24 +62,12 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				BehaviourType behaviour = BehaviourType::None;
 				packet >> behaviour;
 				if (behaviour != BehaviourType::None) {
-					switch (behaviour)
-					{
-					case BehaviourType::Spaceship:
-						gameObject->behaviour = App->modBehaviour->addSpaceship(gameObject);
-						break;
-					case BehaviourType::Laser:
-						gameObject->behaviour = App->modBehaviour->addLaser(gameObject);
-						break;
-					default:
-						WLOG("Behaviour with type %i not in switch", behaviour);
-						break;
-					}
+					gameObject->behaviour = App->modBehaviour->addBehaviour(behaviour, gameObject);
 					if (gameObject->behaviour != nullptr) {
 						gameObject->behaviour->read(packet);
 					}
 				}
 			}
 		}
-
 	}
 }
