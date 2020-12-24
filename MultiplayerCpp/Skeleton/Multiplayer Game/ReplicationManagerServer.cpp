@@ -57,6 +57,16 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 					packet << -1;
 				}
 
+				if (gameObject->animation != nullptr && gameObject->animation->clip != nullptr) {
+					packet << 1;
+					packet << gameObject->animation->currentFrame;
+					packet << gameObject->animation->elapsedTime;
+					packet << gameObject->animation->clip->id;
+				}
+				else {
+					packet << -1;
+				}
+
 				if (gameObject->behaviour != nullptr) {
 					packet << gameObject->behaviour->type();
 					gameObject->behaviour->write(packet);
