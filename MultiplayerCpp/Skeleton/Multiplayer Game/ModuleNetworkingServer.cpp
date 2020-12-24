@@ -353,9 +353,11 @@ GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initi
 {
 	auto go = NetworkInstantiate();
 	go->sprite = App->modRender->addSprite(go);
-	go->sprite->texture = App->modResources->asteroid1;
+	go->sprite->texture = App->modResources->power_up1;
 	go->behaviour = App->modBehaviour->addPowerUp(go);
-	//go->behaviour->isServer = true;
+	go->behaviour->isServer = true;
+	// Create collider
+	go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
 
 	// Create a new game object with the player properties
 	GameObject *gameObject = NetworkInstantiate();

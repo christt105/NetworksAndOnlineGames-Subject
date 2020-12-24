@@ -45,7 +45,7 @@ void Spaceship::start()
 	lifebar->sprite->order = 5;
 }
 
-void Spaceship::onInput(const InputController &input)
+void Spaceship::onInput(const InputController& input)
 {
 	if (input.horizontalAxis != 0.0f)
 	{
@@ -73,20 +73,49 @@ void Spaceship::onInput(const InputController &input)
 	{
 		if (isServer)
 		{
-			GameObject *laser = NetworkInstantiate();
+			switch (pwt)
+			{
+			case Spaceship::Triple: {
+				float angles[3] = { -15.f, 0.f, 15.f };
+				for (int i = 0; i < 3; ++i) {
+					GameObject* laser = NetworkInstantiate();
 
-			laser->position = gameObject->position;
-			laser->angle = gameObject->angle;
-			laser->size = { 20, 60 };
+					laser->position = gameObject->position;
+					laser->angle = gameObject->angle + angles[i];
+					laser->size = { 20, 60 };
 
-			laser->sprite = App->modRender->addSprite(laser);
-			laser->sprite->order = 3;
-			laser->sprite->texture = App->modResources->laser;
+					laser->sprite = App->modRender->addSprite(laser);
+					laser->sprite->order = 3;
+					laser->sprite->texture = App->modResources->laser;
 
-			Laser *laserBehaviour = App->modBehaviour->addLaser(laser);
-			laserBehaviour->isServer = isServer;
+					Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
+					laserBehaviour->isServer = isServer;
 
-			laser->tag = gameObject->tag;
+					laser->tag = gameObject->tag;
+				}
+				break;
+			}
+			case Spaceship::BackAndFront:
+				break;
+			case Spaceship::Bounds:
+				break;
+			default:
+				GameObject* laser = NetworkInstantiate();
+
+				laser->position = gameObject->position;
+				laser->angle = gameObject->angle;
+				laser->size = { 20, 60 };
+
+				laser->sprite = App->modRender->addSprite(laser);
+				laser->sprite->order = 3;
+				laser->sprite->texture = App->modResources->laser;
+
+				Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
+				laserBehaviour->isServer = isServer;
+
+				laser->tag = gameObject->tag;
+				break;
+			}
 		}
 	}
 }
@@ -151,6 +180,11 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 			App->modSound->playAudioClip(App->modResources->audioClipExplosion);
 		}
 	}
+	if (c2.type == ColliderType::PowerUp) {
+		LOG("You Get A Power Up");
+		NetworkDestroy(c2.gameObject);
+		pwt = Triple;
+	}
 }
 
 void Spaceship::write(OutputMemoryStream & packet)
@@ -172,11 +206,4 @@ void PowerUp::update()
 {
 	gameObject->angle += 0.1f;
 	gameObject->position.x += 1.f;
-}
-
-void PowerUp::onCollisionTriggered(Collider& c1, Collider& c2)
-{
-	if (c2.type == ColliderType::Player) {
-		LOG("JAJAJJAJ XD");
-	}
 }

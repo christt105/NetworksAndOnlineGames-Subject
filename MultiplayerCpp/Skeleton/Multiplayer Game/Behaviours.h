@@ -58,8 +58,6 @@ struct PowerUp : public Behaviour
 	void start() override;
 
 	void update() override;
-
-	void onCollisionTriggered(Collider& c1, Collider& c2) override;
 };
 
 
@@ -67,6 +65,16 @@ struct Spaceship : public Behaviour
 {
 	static const uint8 MAX_HIT_POINTS = 5;
 	uint8 hitPoints = MAX_HIT_POINTS;
+
+	enum PowerUpType {
+		None,
+		Triple,
+		BackAndFront,
+		Shield,
+		Bounds
+	};
+
+	PowerUpType pwt = None;
 
 	GameObject *lifebar = nullptr;
 
