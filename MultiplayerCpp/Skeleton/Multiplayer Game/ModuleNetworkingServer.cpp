@@ -278,6 +278,8 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in & fromAddress)
 		// Clear the client proxy
 		destroyClientProxy(proxy);
 	}
+
+	spawnPowerUp();
 }
 
 void ModuleNetworkingServer::onDisconnect()
