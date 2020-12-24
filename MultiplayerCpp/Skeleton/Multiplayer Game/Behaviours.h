@@ -71,15 +71,20 @@ struct Spaceship : public Behaviour
 
 	enum PowerUpType {
 		None,
-		Triple,
+		Double,
 		BackAndFront,
 		Shield,
-		Bounds
+		Back
 	};
 
-	PowerUpType pwt = None;
+	PowerUpType pwt = Shield;
+
+	float angle = 0.f;
+	float orbit_speed = 2.5f;
+	float radius = 90.f;
 
 	GameObject *lifebar = nullptr;
+	GameObject *shield = nullptr;
 
 	BehaviourType type() const override { return BehaviourType::Spaceship; }
 

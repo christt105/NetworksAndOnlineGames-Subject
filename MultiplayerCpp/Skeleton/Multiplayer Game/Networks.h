@@ -86,7 +86,8 @@ enum class ColliderType
 	None,
 	Player,
 	Laser,
-	PowerUp
+	PowerUp,
+	Shield
 };
 
 

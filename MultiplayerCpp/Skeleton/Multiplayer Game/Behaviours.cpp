@@ -53,6 +53,12 @@ void Spaceship::start()
 	lifebar->sprite = App->modRender->addSprite(lifebar);
 	lifebar->sprite->pivot = vec2{ 0.0f, 0.5f };
 	lifebar->sprite->order = 5;
+
+	shield = Instantiate(); //TODO: in other object ??
+	shield->sprite = App->modRender->addSprite(shield);
+	shield->sprite->texture = App->modResources->power_up2;
+	shield->collider = App->modCollision->addCollider(ColliderType::Shield, shield);
+	shield->collider->isTrigger = true;
 }
 
 void Spaceship::onInput(const InputController& input)
@@ -85,8 +91,50 @@ void Spaceship::onInput(const InputController& input)
 		{
 			switch (pwt)
 			{
-			case Spaceship::Triple: {
-				float angles[3] = { -15.f, 0.f, 15.f };
+			case Spaceship::Double: {
+				float angles[2] = { -15.f, 15.f };
+				for (int i = 0; i < 2; ++i) {
+					GameObject* laser = NetworkInstantiate();
+
+					laser->position = gameObject->position;
+					laser->angle = gameObject->angle + angles[i];
+					laser->size = { 20, 60 };
+
+					laser->sprite = App->modRender->addSprite(laser);
+					laser->sprite->order = 3;
+					laser->sprite->texture = App->modResources->laser;
+					laser->sprite->color = { 1.f, 0.623f, 0.2f, 1.f };
+
+					Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
+					laserBehaviour->isServer = isServer;
+
+					laser->tag = gameObject->tag;
+				}
+				break;
+			}
+			case Spaceship::BackAndFront: {
+				float angles[2] = { 0.f, 180.f };
+				for (int i = 0; i < 2; ++i) {
+					GameObject* laser = NetworkInstantiate();
+
+					laser->position = gameObject->position;
+					laser->angle = gameObject->angle + angles[i];
+					laser->size = { 20, 60 };
+
+					laser->sprite = App->modRender->addSprite(laser);
+					laser->sprite->order = 3;
+					laser->sprite->texture = App->modResources->laser;
+					laser->sprite->color = { 0.f, 1.f, 0.f, 1.f };
+
+					Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
+					laserBehaviour->isServer = isServer;
+
+					laser->tag = gameObject->tag;
+				}
+				break;
+			}
+			case Spaceship::Back: {
+				float angles[3] = { (180.f + 15.f), 0.f, (180.f - 15.f) };
 				for (int i = 0; i < 3; ++i) {
 					GameObject* laser = NetworkInstantiate();
 
@@ -97,6 +145,7 @@ void Spaceship::onInput(const InputController& input)
 					laser->sprite = App->modRender->addSprite(laser);
 					laser->sprite->order = 3;
 					laser->sprite->texture = App->modResources->laser;
+					laser->sprite->color = { 0.f, 0.f, 1.f, 1.f };
 
 					Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
 					laserBehaviour->isServer = isServer;
@@ -105,10 +154,6 @@ void Spaceship::onInput(const InputController& input)
 				}
 				break;
 			}
-			case Spaceship::BackAndFront:
-				break;
-			case Spaceship::Bounds:
-				break;
 			default:
 				GameObject* laser = NetworkInstantiate();
 
@@ -119,6 +164,7 @@ void Spaceship::onInput(const InputController& input)
 				laser->sprite = App->modRender->addSprite(laser);
 				laser->sprite->order = 3;
 				laser->sprite->texture = App->modResources->laser;
+				laser->sprite->color = { 1.f, 0.f, 0.f, 1.f };
 
 				Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
 				laserBehaviour->isServer = isServer;
@@ -138,11 +184,15 @@ void Spaceship::update()
 	lifebar->position = gameObject->position + vec2{ -50.0f, -50.0f };
 	lifebar->size = vec2{ lifeRatio * 80.0f, 5.0f };
 	lifebar->sprite->color = lerp(colorDead, colorAlive, lifeRatio);
+
+	angle += orbit_speed * Time.deltaTime;
+	shield->position = gameObject->position + vec2{ radius * cos(angle), radius * sin(angle) };
 }
 
 void Spaceship::destroy()
 {
 	Destroy(lifebar);
+	Destroy(shield);
 }
 
 void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
@@ -191,9 +241,8 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 		}
 	}
 	if (c2.type == ColliderType::PowerUp) {
-		LOG("You Get A Power Up");
 		NetworkDestroy(c2.gameObject);
-		pwt = Triple;
+		pwt = Double;
 	}
 }
 
@@ -209,7 +258,6 @@ void Spaceship::read(const InputMemoryStream & packet)
 
 void PowerUp::start()
 {
-	LOG("HOLA");
 }
 
 void PowerUp::update()
