@@ -10,6 +10,16 @@ void Laser::start()
 	App->modSound->playAudioClip(App->modResources->audioClipLaser);
 }
 
+void Laser::write(OutputMemoryStream& packet)
+{
+	packet << secondsSinceCreation;
+}
+
+void Laser::read(const InputMemoryStream& packet)
+{
+	packet >> secondsSinceCreation;
+}
+
 void Laser::update()
 {
 	secondsSinceCreation += Time.deltaTime;

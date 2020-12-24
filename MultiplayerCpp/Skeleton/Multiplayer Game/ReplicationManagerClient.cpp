@@ -43,6 +43,15 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			packet >> gameObject->tag;
 			packet >> gameObject->networkInterpolationEnabled;
 
+			BehaviourType behaviour = BehaviourType::None;
+			packet >> behaviour;
+			if (behaviour != BehaviourType::None) {
+				if (gameObject->behaviour == nullptr) {
+					gameObject->behaviour = App->modBehaviour->addBehaviour(behaviour, gameObject);
+				}
+				gameObject->behaviour->read(packet);
+			}
+
 			if (action == ReplicationAction::Create) {
 				int id = -1;
 				packet >> id;
@@ -67,15 +76,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					uint16 clipID;
 					packet >> clipID;
 					gameObject->animation->clip = App->modRender->getAnimationClip(clipID);
-				}
-
-				BehaviourType behaviour = BehaviourType::None;
-				packet >> behaviour;
-				if (behaviour != BehaviourType::None) {
-					gameObject->behaviour = App->modBehaviour->addBehaviour(behaviour, gameObject);
-					if (gameObject->behaviour != nullptr) {
-						gameObject->behaviour->read(packet);
-					}
 				}
 			}
 		}
