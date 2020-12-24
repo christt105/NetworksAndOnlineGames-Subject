@@ -203,8 +203,10 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 		}
 		break;
 		case ClientMessage::Ping:
-			// TODO(you): UDP virtual connection lab session
-			proxy->secondsSinceLastReceivedPacket = 0.f;
+			if (proxy != nullptr) {
+				// TODO(you): UDP virtual connection lab session
+				proxy->secondsSinceLastReceivedPacket = 0.f;
+			}
 			break;
 		default:
 			break;
@@ -276,6 +278,8 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in & fromAddress)
 		// Clear the client proxy
 		destroyClientProxy(proxy);
 	}
+
+	spawnPowerUp();
 }
 
 void ModuleNetworkingServer::onDisconnect()
@@ -351,13 +355,7 @@ void ModuleNetworkingServer::destroyClientProxy(ClientProxy *clientProxy)
 
 GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle)
 {
-	auto go = NetworkInstantiate();
-	go->sprite = App->modRender->addSprite(go);
-	go->sprite->texture = App->modResources->power_up1;
-	go->behaviour = App->modBehaviour->addPowerUp(go);
-	go->behaviour->isServer = true;
-	// Create collider
-	go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
+	spawnPowerUp();
 
 	// Create a new game object with the player properties
 	GameObject *gameObject = NetworkInstantiate();
@@ -388,6 +386,17 @@ GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initi
 	gameObject->behaviour->isServer = true;
 
 	return gameObject;
+}
+
+void ModuleNetworkingServer::spawnPowerUp()
+{
+	auto go = NetworkInstantiate();
+	go->sprite = App->modRender->addSprite(go);
+	go->sprite->texture = App->modResources->power_up1;
+	go->behaviour = App->modBehaviour->addPowerUp(go);
+	go->behaviour->isServer = true;
+	// Create collider
+	go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
 }
 
 

@@ -245,7 +245,7 @@ void ModuleNetworkingClient::onUpdate()
 		}
 		else
 		{
-			// This means that the player has been destroyed (e.g. killed)
+			disconnect();
 		}
 	}
 }
