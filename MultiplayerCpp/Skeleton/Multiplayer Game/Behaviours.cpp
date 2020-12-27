@@ -57,7 +57,7 @@ void Spaceship::start()
 	if (shield == nullptr) {
 		shield = Instantiate();
 		shield->sprite = App->modRender->addSprite(shield);
-		shield->sprite->texture = App->modResources->power_up2;
+		shield->sprite->texture = App->modResources->shield;
 	}
 }
 
@@ -283,7 +283,7 @@ void Spaceship::write(OutputMemoryStream& packet)
 		if (shield == nullptr) {
 			shield = Instantiate();
 			shield->sprite = App->modRender->addSprite(shield);
-			shield->sprite->texture = App->modResources->power_up2;
+			shield->sprite->texture = App->modResources->shield;
 		}
 		packet << shield->position.x;
 		packet << shield->position.y;
@@ -302,7 +302,7 @@ void Spaceship::read(const InputMemoryStream& packet)
 		if (shield == nullptr) {
 			shield = Instantiate();
 			shield->sprite = App->modRender->addSprite(shield);
-			shield->sprite->texture = App->modResources->power_up2;
+			shield->sprite->texture = App->modResources->shield;
 		}
 		packet >> shield->position.x;
 		packet >> shield->position.y;
