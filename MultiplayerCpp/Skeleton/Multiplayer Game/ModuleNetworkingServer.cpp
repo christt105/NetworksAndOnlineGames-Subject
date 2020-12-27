@@ -278,8 +278,6 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in & fromAddress)
 		// Clear the client proxy
 		destroyClientProxy(proxy);
 	}
-
-	spawnPowerUp();
 }
 
 void ModuleNetworkingServer::onDisconnect()
@@ -353,12 +351,10 @@ void ModuleNetworkingServer::destroyClientProxy(ClientProxy *clientProxy)
 // Spawning
 //////////////////////////////////////////////////////////////////////
 
-GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle)
+GameObject* ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle)
 {
-	spawnPowerUp();
-
 	// Create a new game object with the player properties
-	GameObject *gameObject = NetworkInstantiate();
+	GameObject* gameObject = NetworkInstantiate();
 	gameObject->position = initialPosition;
 	gameObject->size = { 100, 100 };
 	gameObject->angle = initialAngle;
@@ -381,22 +377,11 @@ GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initi
 	gameObject->collider->isTrigger = true; // NOTE(jesus): This object will receive onCollisionTriggered events
 
 	// Create behaviour
-	Spaceship * spaceshipBehaviour = App->modBehaviour->addSpaceship(gameObject);
+	Spaceship* spaceshipBehaviour = App->modBehaviour->addSpaceship(gameObject);
 	gameObject->behaviour = spaceshipBehaviour;
 	gameObject->behaviour->isServer = true;
 
 	return gameObject;
-}
-
-void ModuleNetworkingServer::spawnPowerUp()
-{
-	auto go = NetworkInstantiate();
-	go->sprite = App->modRender->addSprite(go);
-	go->sprite->texture = App->modResources->power_up1;
-	go->behaviour = App->modBehaviour->addPowerUp(go);
-	go->behaviour->isServer = true;
-	// Create collider
-	go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
 }
 
 
