@@ -13,6 +13,7 @@ void ModuleNetworkingServer::setListenPort(int port)
 
 void ModuleNetworkingServer::playAudio(uint32 id)
 {
+	App->modSound->playAudioClipWithID(id);
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if (clientProxies[i].connected)
