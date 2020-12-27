@@ -21,6 +21,7 @@ public:
 	Texture *power_up2 = nullptr;
 	Texture *power_up3 = nullptr;
 	Texture *power_up4 = nullptr;
+	Texture *shield = nullptr;
 
 	AnimationClip *explosionClip = nullptr;
 

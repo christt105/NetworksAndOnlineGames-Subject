@@ -54,11 +54,11 @@ void Spaceship::start()
 	lifebar->sprite->pivot = vec2{ 0.0f, 0.5f };
 	lifebar->sprite->order = 5;
 
-	shield = Instantiate(); //TODO: in other object ??
-	shield->sprite = App->modRender->addSprite(shield);
-	shield->sprite->texture = App->modResources->power_up2;
-	shield->collider = App->modCollision->addCollider(ColliderType::Shield, shield);
-	shield->collider->isTrigger = true;
+	if (shield == nullptr) {
+		shield = Instantiate();
+		shield->sprite = App->modRender->addSprite(shield);
+		shield->sprite->texture = App->modResources->shield;
+	}
 }
 
 void Spaceship::onInput(const InputController& input)
@@ -185,14 +185,22 @@ void Spaceship::update()
 	lifebar->size = vec2{ lifeRatio * 80.0f, 5.0f };
 	lifebar->sprite->color = lerp(colorDead, colorAlive, lifeRatio);
 
-	angle += orbit_speed * Time.deltaTime;
-	shield->position = gameObject->position + vec2{ radius * cos(angle), radius * sin(angle) };
+	if (pwt != PowerUpType::Shield && shield != nullptr) {
+		Destroy(shield);
+		shield = nullptr;
+	}
+	if (shield != nullptr) {
+		angle += orbit_speed * Time.deltaTime;
+		shield->position = gameObject->position + vec2{ radius * cos(angle), radius * sin(angle) };
+	}
 }
 
 void Spaceship::destroy()
 {
 	Destroy(lifebar);
-	Destroy(shield);
+	if (shield != nullptr) {
+		Destroy(shield);
+	}
 }
 
 void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
@@ -201,6 +209,15 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 	{
 		if (isServer)
 		{
+			if (pwt == PowerUpType::Shield) {
+				pwt = PowerUpType::None;
+				Destroy(shield);
+				shield = nullptr;
+				NetworkDestroy(c2.gameObject); // Destroy the laser
+				NetworkUpdate(gameObject);
+				return;
+			}
+
 			NetworkDestroy(c2.gameObject); // Destroy the laser
 		
 			if (hitPoints > 0)
@@ -268,18 +285,50 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 	}
 	if (c2.type == ColliderType::PowerUp) {
 		pwt = ((PowerUp*)c2.gameObject->behaviour)->pwt;
+		if (pwt == PowerUpType::Shield) {
+			Destroy(shield);
+			shield = nullptr;
+		}
 		NetworkDestroy(c2.gameObject);
 	}
 }
 
-void Spaceship::write(OutputMemoryStream & packet)
+void Spaceship::write(OutputMemoryStream& packet)
 {
 	packet << hitPoints;
+	packet << pwt;
+	if (pwt == PowerUpType::Shield) {
+		if (shield == nullptr) {
+			shield = Instantiate();
+			shield->sprite = App->modRender->addSprite(shield);
+			shield->sprite->texture = App->modResources->shield;
+		}
+		packet << shield->position.x;
+		packet << shield->position.y;
+	}
+	else if (shield != nullptr) {
+		Destroy(shield);
+		shield = nullptr;
+	}
 }
 
-void Spaceship::read(const InputMemoryStream & packet)
+void Spaceship::read(const InputMemoryStream& packet)
 {
 	packet >> hitPoints;
+	packet >> pwt;
+	if (pwt == PowerUpType::Shield) {
+		if (shield == nullptr) {
+			shield = Instantiate();
+			shield->sprite = App->modRender->addSprite(shield);
+			shield->sprite->texture = App->modResources->shield;
+		}
+		packet >> shield->position.x;
+		packet >> shield->position.y;
+	}
+	else if (shield != nullptr) {
+		Destroy(shield);
+		shield = nullptr;
+	}
 }
 
 void PowerUp::start()
