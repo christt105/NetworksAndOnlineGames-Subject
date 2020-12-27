@@ -2,7 +2,7 @@
 
 enum class ReplicationAction
 {
-    None, Create, Update, Destroy
+    None, Create, Update, Destroy, PlayAudio
 };
 
 struct ReplicationCommand

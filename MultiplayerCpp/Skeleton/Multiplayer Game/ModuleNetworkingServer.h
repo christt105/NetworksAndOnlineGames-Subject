@@ -13,7 +13,7 @@ public:
 
 	void setListenPort(int port);
 
-
+	void playAudio(uint32 id);
 
 private:
 
@@ -81,7 +81,6 @@ public:
 	//////////////////////////////////////////////////////////////////////
 
 	GameObject * spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle);
-	void spawnPowerUp();
 
 
 private:

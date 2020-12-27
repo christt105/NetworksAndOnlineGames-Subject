@@ -235,6 +235,16 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 				size = 250.0f + 100.0f * Random.next();
 				position = gameObject->position;
 
+				// Create power up
+				auto go = NetworkInstantiate();
+				go->position = gameObject->position;
+				go->sprite = App->modRender->addSprite(go);
+				go->sprite->texture = App->modResources->power_up1;
+				go->behaviour = App->modBehaviour->addPowerUp(go);
+				go->behaviour->isServer = true;
+				// Create collider
+				go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
+
 				NetworkDestroy(gameObject);
 			}
 
@@ -252,9 +262,7 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 
 			NetworkDestroy(explosion, 2.0f);
 
-			// NOTE(jesus): Only played in the server right now...
-			// You need to somehow make this happen in clients
-			App->modSound->playAudioClip(App->modResources->audioClipExplosion);
+			App->modNetServer->playAudio(App->modResources->audioClipExplosion->id);
 		}
 	}
 	if (c2.type == ColliderType::PowerUp) {
@@ -312,5 +320,4 @@ void PowerUp::start()
 void PowerUp::update()
 {
 	gameObject->angle += 0.1f;
-	gameObject->position.x += 1.f;
 }

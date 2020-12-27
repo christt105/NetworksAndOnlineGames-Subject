@@ -21,6 +21,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			App->modLinkingContext->unregisterNetworkGameObject(gameObject);
 			App->modGameObject->Destroy(gameObject);
 		}
+		else if (action == ReplicationAction::PlayAudio) {
+			App->modSound->playAudioClipWithID(id);
+		}
 		else if (action != ReplicationAction::None) {
 			GameObject* gameObject = nullptr;
 			if (action == ReplicationAction::Update) {

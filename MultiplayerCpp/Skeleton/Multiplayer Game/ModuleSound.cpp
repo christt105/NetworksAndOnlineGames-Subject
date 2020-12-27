@@ -302,6 +302,7 @@ bool ModuleSound::cleanUp()
 
 AudioClip * ModuleSound::loadAudioClip(const char * filename)
 {
+	static uint32 id = 0;
 	AudioClip *audioClip = nullptr;
 
 	for (uint32 i = 0; i < ArrayCount(audioClips); ++i)
@@ -363,6 +364,7 @@ AudioClip * ModuleSound::loadAudioClip(const char * filename)
 			audioClip->channelCount = Fmt.NumChannels;
 			audioClip->sampleCount = dataSize / (Fmt.BitsPerSample / 8);
 			audioClip->samples = data;
+			audioClip->id = ++id;
 
 			fclose(file);
 		}
@@ -404,6 +406,16 @@ void ModuleSound::playAudioClip(AudioClip * audioClip)
 			audioSources[i].clip = audioClip;
 			audioSources[i].lastWriteSampleIndex = 0;
 			audioSources[i].flags = AUDIO_SOURCE_START_BIT;
+			break;
+		}
+	}
+}
+
+void ModuleSound::playAudioClipWithID(uint32 id)
+{
+	for (int i = 0; i < ArrayCount(audioClips); ++i) {
+		if (audioClips[i].id == id) {
+			playAudioClip(&audioClips[i]);
 			break;
 		}
 	}

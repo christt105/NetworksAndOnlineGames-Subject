@@ -9,6 +9,7 @@ class ReplicationManagerServer
 {
 public:
     void create(uint32 networkId);
+    void playAudio(uint32 audioID);
     void update(uint32 networkId);
     void destroy(uint32 networkId);
 

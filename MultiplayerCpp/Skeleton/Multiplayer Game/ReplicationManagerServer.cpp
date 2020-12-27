@@ -8,6 +8,11 @@ void ReplicationManagerServer::create(uint32 networkId)
 	actions.emplace(networkId, ReplicationAction::Create);
 }
 
+void ReplicationManagerServer::playAudio(uint32 audioID)
+{
+	actions.emplace(audioID, ReplicationAction::PlayAudio);
+}
+
 void ReplicationManagerServer::update(uint32 networkId)
 {
 	actions[networkId] = ReplicationAction::Update;
@@ -30,7 +35,7 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 		packet << (*item).second;
 
 		// Clear/Update states
-		if ((*item).second == ReplicationAction::Destroy) {
+		if ((*item).second == ReplicationAction::Destroy || (*item).second == ReplicationAction::PlayAudio) {
 			item = actions.erase(item);
 			continue;
 		}
