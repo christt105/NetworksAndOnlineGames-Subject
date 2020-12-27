@@ -52,15 +52,29 @@ struct Laser : public Behaviour
 	void update() override;
 };
 
+enum PowerUpType {
+	None,
+	Double,
+	BackAndFront,
+	Shield,
+	Back
+};
+
 struct PowerUp : public Behaviour
 {
 	float secondsSinceCreation = 0.0f;
+
+	PowerUpType pwt = None;
 
 	BehaviourType type() const override { return BehaviourType::PowerUp; }
 
 	void start() override;
 
 	void update() override;
+
+	void write(OutputMemoryStream& packet) override;
+
+	void read(const InputMemoryStream& packet) override;
 };
 
 
@@ -69,15 +83,7 @@ struct Spaceship : public Behaviour
 	static const uint8 MAX_HIT_POINTS = 5;
 	uint8 hitPoints = MAX_HIT_POINTS;
 
-	enum PowerUpType {
-		None,
-		Double,
-		BackAndFront,
-		Shield,
-		Back
-	};
-
-	PowerUpType pwt = Shield;
+	PowerUpType pwt = None;
 
 	float angle = 0.f;
 	float orbit_speed = 2.5f;
