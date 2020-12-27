@@ -11,6 +11,17 @@ void ModuleNetworkingServer::setListenPort(int port)
 	listenPort = port;
 }
 
+void ModuleNetworkingServer::playAudio(uint32 id)
+{
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			clientProxies[i].replication_server.playAudio(id);
+		}
+	}
+}
+
 
 
 //////////////////////////////////////////////////////////////////////

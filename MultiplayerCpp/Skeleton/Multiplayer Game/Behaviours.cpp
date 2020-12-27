@@ -245,9 +245,7 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 
 			NetworkDestroy(explosion, 2.0f);
 
-			// NOTE(jesus): Only played in the server right now...
-			// You need to somehow make this happen in clients
-			App->modSound->playAudioClip(App->modResources->audioClipExplosion);
+			App->modNetServer->playAudio(App->modResources->audioClipExplosion->id);
 		}
 	}
 	if (c2.type == ColliderType::PowerUp) {

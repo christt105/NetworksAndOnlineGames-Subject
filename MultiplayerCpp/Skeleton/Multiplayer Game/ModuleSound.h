@@ -12,6 +12,7 @@ struct AudioClip
 	uint32 samplingRate = 0;
 	uint16 bitsPerSample = 0;
 	uint16 channelCount = 0;
+	uint32 id = 0;
 };
 
 class ModuleSound : public Module
@@ -34,6 +35,7 @@ public:
 	void freeAudioClip(AudioClip *audioClip);
 
 	void playAudioClip(AudioClip *audioClip);
+	void playAudioClipWithID(uint32 id);
 
 private:
 

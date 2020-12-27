@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "ModuleResources.h"
 
 
 #if defined(USE_TASK_MANAGER)
@@ -10,7 +11,6 @@ void ModuleResources::TaskLoadTexture::execute()
 }
 
 #endif
-
 
 bool ModuleResources::init()
 {
