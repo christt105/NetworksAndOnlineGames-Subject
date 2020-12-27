@@ -68,6 +68,7 @@ Texture* ModuleTextures::GetTextureByID(int texture_id) const
 		if (_textures[i].id == texture_id)
 			return (Texture*)&_textures[i];
 	}
+	ELOG("Texture with id %i not found", texture_id);
 	return nullptr;
 }
 
