@@ -23,6 +23,12 @@ inline float radiansFromDegrees(float degrees)
 	return radians;
 }
 
+inline float degreesFromRadians(float radians)
+{
+	const float degrees = radians * 180.0f / PI;
+	return degrees;
+}
+
 inline float fractionalPart(float number)
 {
 	const float f = number - (int)number;

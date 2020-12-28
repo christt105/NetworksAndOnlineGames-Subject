@@ -13,6 +13,8 @@ public:
 	Laser		* addLaser(GameObject *parentGameObject);
 	PowerUp     * addPowerUp(GameObject *parentGameObject);
 
+	std::vector<vec2> GetSpaceshipsPosition(const GameObject* ignore) const;
+
 private:
 
 	void handleBehaviourLifeCycle(Behaviour * behaviour);

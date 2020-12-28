@@ -15,7 +15,7 @@ public:
 
 	void setPlayerInfo(const char *playerName, uint8 spaceshipType);
 
-
+	uint32 GetNetworkID() const;
 
 private:
 

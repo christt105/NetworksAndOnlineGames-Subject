@@ -59,6 +59,17 @@ void Spaceship::start()
 		shield->sprite = App->modRender->addSprite(shield);
 		shield->sprite->texture = App->modResources->shield;
 	}
+
+	if (!isServer && App->modLinkingContext->getNetworkGameObject(App->modNetClient->GetNetworkID()) == gameObject) {
+		auto spaceships = App->modBehaviour->GetSpaceshipsPosition(gameObject);
+		for (int i = 0; i < spaceships.size(); ++i) {
+			GameObject* arr = Instantiate();
+			arr->sprite = App->modRender->addSprite(arr);
+			arr->sprite->texture = App->modResources->arrow;
+			arr->sprite->color = vec4{ (float)(rand()%255) / 255.f,(float)(rand() % 255) / 255.f,(float)(rand() % 255) / 255.f,1.f };
+			arrows.push_back(arr);
+		}
+	}
 }
 
 void Spaceship::onInput(const InputController& input)
@@ -193,6 +204,33 @@ void Spaceship::update()
 		angle += orbit_speed * Time.deltaTime;
 		shield->position = gameObject->position + vec2{ radius * cos(angle), radius * sin(angle) };
 	}
+
+	if (!isServer && App->modLinkingContext->getNetworkGameObject(App->modNetClient->GetNetworkID()) == gameObject) {
+		auto spaceships = App->modBehaviour->GetSpaceshipsPosition(gameObject);
+		if (spaceships.size() > arrows.size()) {
+			int n = spaceships.size() - arrows.size();
+			for (int a = 0; a < n; ++a) {
+				GameObject* arr = Instantiate();
+				arr->sprite = App->modRender->addSprite(arr);
+				arr->sprite->texture = App->modResources->arrow;
+				arr->sprite->color = vec4{ 1.f,0.6f,0.1f,1.f };
+				arrows.push_back(arr);
+			}
+		}
+		if (spaceships.size() < arrows.size()) {
+			int n = arrows.size() - spaceships.size();
+			for (int a = 0; a < n; ++a) {
+				Destroy(arrows[a]);
+				arrows.pop_back();
+			}
+		}
+		float rad = 75.f;
+		for (int i = 0; i < spaceships.size(); ++i) {
+			vec2 direction = normalize(spaceships[i] - gameObject->position);
+			arrows[i]->position = gameObject->position + direction * rad;
+			arrows[i]->angle = degreesFromRadians(atan2f(direction.y, direction.x));
+		}
+	}
 }
 
 void Spaceship::destroy()
@@ -201,6 +239,14 @@ void Spaceship::destroy()
 	if (shield != nullptr) {
 		Destroy(shield);
 	}
+	for (auto i = arrows.begin(); i != arrows.end(); ++i) {
+		Destroy(*i);
+	}
+}
+
+bool Spaceship::checkPosition(const vec2& pos1, const vec2& pos2, float range) const
+{
+	return pos1.x - range < pos2.x && pos1.y - range < pos2.y && pos1.x + range > pos2.x && pos1.y + range > pos2.y;
 }
 
 void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)

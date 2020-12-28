@@ -88,6 +88,18 @@ PowerUp* ModuleBehaviour::addPowerUp(GameObject* parentGameObject)
 	return nullptr;
 }
 
+std::vector<vec2> ModuleBehaviour::GetSpaceshipsPosition(const GameObject* ignore) const
+{
+	std::vector<vec2> ret;
+	int i = 0;
+	for (Spaceship behaviour : spaceships)
+	{
+		if (behaviour.gameObject != nullptr && behaviour.gameObject != ignore)
+			ret.push_back(behaviour.gameObject->position);
+	}
+	return ret;
+}
+
 void ModuleBehaviour::handleBehaviourLifeCycle(Behaviour *behaviour)
 {
 	GameObject *gameObject = behaviour->gameObject;

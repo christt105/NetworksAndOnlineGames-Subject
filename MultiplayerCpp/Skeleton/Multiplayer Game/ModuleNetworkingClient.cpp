@@ -18,6 +18,11 @@ void ModuleNetworkingClient::setPlayerInfo(const char * pPlayerName, uint8 pSpac
 	spaceshipType = pSpaceshipType;
 }
 
+uint32 ModuleNetworkingClient::GetNetworkID() const
+{
+	return networkId;
+}
+
 
 
 //////////////////////////////////////////////////////////////////////
