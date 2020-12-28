@@ -148,6 +148,9 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			packet >> i;
 			inputDataFront = i;
 			break; }
+		case ServerMessage::ChangeNetworkID: {
+			packet >> networkId;
+			break; }
 		}
 	}
 }
@@ -245,7 +248,10 @@ void ModuleNetworkingClient::onUpdate()
 		}
 		else
 		{
-			disconnect();
+			OutputMemoryStream packet;
+			packet << PROTOCOL_ID;
+			packet << ClientMessage::Respawn;
+			sendPacket(packet, serverAddress);
 		}
 	}
 }

@@ -179,6 +179,13 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 			}
 		}
 		break;
+		case ClientMessage::Respawn: 
+		{
+			if (proxy != nullptr && proxy->gameObject == nullptr && !proxy->respawning) {
+				proxy->respawning = true;
+				proxy->deadTime = Time.time;
+			}
+		break; }
 		case ClientMessage::Input:
 		{
 			// Process the input packet and update the corresponding game object
@@ -267,6 +274,20 @@ void ModuleNetworkingServer::onUpdate()
 				if (!IsValid(clientProxy.gameObject))
 				{
 					clientProxy.gameObject = nullptr;
+				}
+
+				if (clientProxy.gameObject == nullptr && clientProxy.respawning && clientProxy.deadTime + 2 < Time.time) {
+					clientProxy.deadTime = 0.0F;
+					clientProxy.respawning = false;
+					vec2 initialPosition = 500.0f * vec2{ Random.next() - 0.5f, Random.next() - 0.5f };
+					float initialAngle = 360.0f * Random.next();
+					clientProxy.gameObject = spawnPlayer(0, initialPosition, initialAngle);
+
+					OutputMemoryStream packet;
+					packet << PROTOCOL_ID;
+					packet << ServerMessage::ChangeNetworkID;
+					packet << clientProxy.gameObject->networkId;
+					sendPacket(packet, clientProxy.address);
 				}
 
 				// TODO(you): World state replication lab session

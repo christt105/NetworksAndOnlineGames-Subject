@@ -51,6 +51,9 @@ private:
 		std::string name;
 		GameObject *gameObject = nullptr;
 
+		float deadTime = 0.0F;
+		bool respawning = false;
+
 		// TODO(you): UDP virtual connection lab session
 		float secondsSinceLastReceivedPacket = 0.f;
 		float secondsSinceLastPing = 0.f;
