@@ -102,7 +102,7 @@ void Spaceship::onInput(const InputController& input)
 		{
 			switch (pwt)
 			{
-			case Spaceship::Double: {
+			case PowerUpType::Double: {
 				float angles[2] = { -15.f, 15.f };
 				for (int i = 0; i < 2; ++i) {
 					GameObject* laser = NetworkInstantiate();
@@ -123,7 +123,7 @@ void Spaceship::onInput(const InputController& input)
 				}
 				break;
 			}
-			case Spaceship::BackAndFront: {
+			case PowerUpType::BackAndFront: {
 				float angles[2] = { 0.f, 180.f };
 				for (int i = 0; i < 2; ++i) {
 					GameObject* laser = NetworkInstantiate();
@@ -144,7 +144,7 @@ void Spaceship::onInput(const InputController& input)
 				}
 				break;
 			}
-			case Spaceship::Back: {
+			case PowerUpType::Back: {
 				float angles[3] = { (180.f + 15.f), 0.f, (180.f - 15.f) };
 				for (int i = 0; i < 3; ++i) {
 					GameObject* laser = NetworkInstantiate();
@@ -284,12 +284,30 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 				// Create power up
 				auto go = NetworkInstantiate();
 				go->position = gameObject->position;
+
 				go->sprite = App->modRender->addSprite(go);
-				go->sprite->texture = App->modResources->power_up1;
+				switch (rand() % 4) {
+				case 0: {
+					go->sprite->texture = App->modResources->power_up1;
+					pwt = PowerUpType::Back;
+					break; }
+				case 1: {
+					go->sprite->texture = App->modResources->power_up2;
+					pwt = PowerUpType::BackAndFront;
+					break; }
+				case 2: {
+					go->sprite->texture = App->modResources->power_up3;
+					pwt = PowerUpType::Double;
+					break; }
+				case 3: {
+					go->sprite->texture = App->modResources->power_up4;
+					pwt = PowerUpType::Shield;
+					break; }
+				}
+				go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
+
 				go->behaviour = App->modBehaviour->addPowerUp(go);
 				go->behaviour->isServer = true;
-				// Create collider
-				go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
 
 				NetworkDestroy(gameObject);
 			}
@@ -312,12 +330,12 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 		}
 	}
 	if (c2.type == ColliderType::PowerUp) {
-		NetworkDestroy(c2.gameObject);
+		pwt = ((PowerUp*)c2.gameObject->behaviour)->pwt;
 		if (pwt == PowerUpType::Shield) {
 			Destroy(shield);
 			shield = nullptr;
 		}
-		pwt = Double;
+		NetworkDestroy(c2.gameObject);
 	}
 }
 
@@ -361,9 +379,35 @@ void Spaceship::read(const InputMemoryStream& packet)
 
 void PowerUp::start()
 {
+
 }
 
 void PowerUp::update()
 {
 	gameObject->angle += 0.1f;
+}
+
+void PowerUp::write(OutputMemoryStream& packet)
+{
+	packet << pwt;
+}
+
+void PowerUp::read(const InputMemoryStream& packet)
+{
+	packet >> pwt;
+
+	//switch (pwt) {
+	//case PowerUpType::Back: {
+	//	gameObject->sprite->texture = App->modResources->power_up1;
+	//	break; }
+	//case PowerUpType::BackAndFront: {
+	//	gameObject->sprite->texture = App->modResources->power_up2;
+	//	break; }
+	//case PowerUpType::Double: {
+	//	gameObject->sprite->texture = App->modResources->power_up3;
+	//	break; }
+	//case PowerUpType::Shield: {
+	//	gameObject->sprite->texture = App->modResources->power_up4;
+	//	break; }
+	//}
 }
