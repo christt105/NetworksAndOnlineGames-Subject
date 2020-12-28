@@ -86,6 +86,8 @@ struct Spaceship : public Behaviour
 	GameObject *lifebar = nullptr;
 	GameObject *shield = nullptr;
 
+	std::vector<GameObject*> arrows;
+
 	BehaviourType type() const override { return BehaviourType::Spaceship; }
 
 	void start() override;
@@ -95,6 +97,8 @@ struct Spaceship : public Behaviour
 	void update() override;
 
 	void destroy() override;
+
+	bool checkPosition(const vec2& pos1, const vec2& pos2, float range) const;
 
 	void onCollisionTriggered(Collider &c1, Collider &c2) override;
 
