@@ -286,27 +286,28 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 				go->position = gameObject->position;
 
 				go->sprite = App->modRender->addSprite(go);
+				go->behaviour = App->modBehaviour->addPowerUp(go);
 				switch (rand() % 4) {
 				case 0: {
 					go->sprite->texture = App->modResources->power_up1;
-					pwt = PowerUpType::Back;
+					((PowerUp*)go->behaviour)->pwt = PowerUpType::Back;
 					break; }
 				case 1: {
 					go->sprite->texture = App->modResources->power_up2;
-					pwt = PowerUpType::BackAndFront;
+					((PowerUp*)go->behaviour)->pwt = PowerUpType::BackAndFront;
 					break; }
 				case 2: {
 					go->sprite->texture = App->modResources->power_up3;
-					pwt = PowerUpType::Double;
+					((PowerUp*)go->behaviour)->pwt = PowerUpType::Double;
 					break; }
 				case 3: {
 					go->sprite->texture = App->modResources->power_up4;
-					pwt = PowerUpType::Shield;
+					((PowerUp*)go->behaviour)->pwt = PowerUpType::Shield;
 					break; }
 				}
 				go->collider = App->modCollision->addCollider(ColliderType::PowerUp, go);
 
-				go->behaviour = App->modBehaviour->addPowerUp(go);
+
 				go->behaviour->isServer = true;
 
 				NetworkDestroy(gameObject);
