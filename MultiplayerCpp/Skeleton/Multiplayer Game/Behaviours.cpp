@@ -331,11 +331,12 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 		}
 	}
 	if (c2.type == ColliderType::PowerUp) {
-		pwt = ((PowerUp*)c2.gameObject->behaviour)->pwt;
 		if (pwt == PowerUpType::Shield) {
-			Destroy(shield);
+			if (shield != nullptr)
+				Destroy(shield);
 			shield = nullptr;
 		}
+		pwt = ((PowerUp*)c2.gameObject->behaviour)->pwt;
 		NetworkDestroy(c2.gameObject);
 	}
 }
