@@ -188,7 +188,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 			}
 		break; }
 		case ClientMessage::PendingAck: {
-			if (proxy != nullptr) {
+			if (proxy != nullptr && proxy->delivery_manager.processSequenceNumber(packet)) {
 				proxy->delivery_manager.processAckdSequenceNumbers(packet);
 			}
 			break; }

@@ -155,6 +155,10 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			packet >> i;
 			inputDataFront = i;
 			break; }
+		case ServerMessage::PendingAck: {
+			if (delivery_manager.processSequenceNumber(packet))
+				delivery_manager.processAckdSequenceNumbers(packet);
+			break; }
 		case ServerMessage::ChangeNetworkID: {
 			if (delivery_manager.processSequenceNumber(packet))
 				packet >> networkId;
