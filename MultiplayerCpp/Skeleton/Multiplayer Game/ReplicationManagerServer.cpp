@@ -23,10 +23,11 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 	actions[networkId] = ReplicationAction::Destroy;
 }
 
-void ReplicationManagerServer::write(OutputMemoryStream& packet)
+void ReplicationManagerServer::write(OutputMemoryStream& packet, ClientProxy* proxy)
 {
 	packet << PROTOCOL_ID;
 	packet << ServerMessage::Replication;
+	proxy->delivery_manager.writeSequenceNumber(packet);
 	packet << actions.size();
 
 	for (auto item = actions.begin(); item != actions.end();) {

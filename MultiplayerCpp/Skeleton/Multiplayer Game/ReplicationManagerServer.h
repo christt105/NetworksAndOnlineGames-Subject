@@ -3,6 +3,7 @@
 #include <map>
 #include "MemoryStream.h"
 
+struct ClientProxy;
 enum class ReplicationAction;
 
 class ReplicationManagerServer
@@ -13,7 +14,7 @@ public:
     void update(uint32 networkId);
     void destroy(uint32 networkId);
 
-    void write(OutputMemoryStream& packet);
+    void write(OutputMemoryStream& packet, ClientProxy* proxy);
 public:
 
 private:
