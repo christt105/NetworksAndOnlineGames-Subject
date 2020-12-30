@@ -261,14 +261,18 @@ void ModuleNetworkingClient::onUpdate()
 		if (playerGameObject != nullptr)
 		{
 			App->modRender->cameraPosition = playerGameObject->position;
+			respawning = false;
 		}
 		else
 		{
-			OutputMemoryStream packet;
-			packet << PROTOCOL_ID;
-			packet << ClientMessage::Respawn;
-			delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(serverAddress, false))->CopyPacket(packet);
-			sendPacket(packet, serverAddress);
+			if (!respawning) {
+				OutputMemoryStream packet;
+				packet << PROTOCOL_ID;
+				packet << ClientMessage::Respawn;
+				delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(serverAddress, false))->CopyPacket(packet);
+				sendPacket(packet, serverAddress);
+				respawning = true;
+			}
 		}
 
 		if (delivery_manager.hasSequenceNumbersPendingAck())
