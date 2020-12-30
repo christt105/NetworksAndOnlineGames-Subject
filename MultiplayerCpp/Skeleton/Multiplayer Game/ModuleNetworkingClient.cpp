@@ -263,6 +263,7 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::Respawn;
+			delivery_manager.writeSequenceNumber(packet, new RespawnDelegate(serverAddress));
 			sendPacket(packet, serverAddress);
 		}
 

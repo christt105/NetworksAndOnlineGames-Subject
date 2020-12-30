@@ -41,6 +41,15 @@ private:
 	ClientProxy* client = nullptr;
 };
 
+class RespawnDelegate : public DeliveryDelegate {
+public:
+	RespawnDelegate(sockaddr_in addr) { this->addr = addr; }
+	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
+	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
+private:
+	sockaddr_in addr;
+};
+
 struct Delivery {
 	~Delivery() { if (delegate != nullptr) { delete delegate; } }
 	uint32 sequenceNumber = 0;

@@ -182,7 +182,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 		break;
 		case ClientMessage::Respawn: 
 		{
-			if (proxy != nullptr && proxy->gameObject == nullptr && !proxy->respawning) {
+			if (proxy != nullptr && proxy->gameObject == nullptr && !proxy->respawning && proxy->delivery_manager.processSequenceNumber(packet)) {
 				proxy->respawning = true;
 				proxy->deadTime = Time.time;
 			}

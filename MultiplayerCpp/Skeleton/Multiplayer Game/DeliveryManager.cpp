@@ -135,3 +135,12 @@ void WelcomeDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
 	welcomePacket << client->gameObject->networkId;
 	App->modNetServer->sendPacket(welcomePacket, client->address);
 }
+
+void RespawnDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
+{
+	OutputMemoryStream packet;
+	packet << PROTOCOL_ID;
+	packet << ClientMessage::Respawn;
+	deliveryManager->writeSequenceNumber(packet, new RespawnDelegate(addr));
+	App->modNetClient->sendPacket(packet, addr);
+}
