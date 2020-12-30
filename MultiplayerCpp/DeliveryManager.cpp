@@ -27,7 +27,6 @@ bool DeliveryManager::processSequenceNumber(const InputMemoryStream& packet)
 	packet >> seq;
 
 	if (seq != nextExpectedSequenceNumber) {
-		LOG("seq is %i and expected %i", seq, nextExpectedSequenceNumber);
 		return false;
 	}
 
@@ -76,15 +75,12 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 
 void DeliveryManager::processTimedoutPackets()
 {
-	for (auto item = pendingDeliveries.begin(); item != pendingDeliveries.end();) {
-		if ((*item)->dispatchTime + TIME_OUT_PACKET < Time.time) {
+	for (auto item = pendingDeliveries.begin(); item != pendingDeliveries.end(); ++item) {
+		if ((*item)->dispatchTime + PACKET_DELIVERY_TIMEOUT_SECONDS < Time.time) {
 			if ((*item)->delegate != nullptr) {
 				(*item)->delegate->onDeliveryFailure(this, *item);
 			}
 			(*item)->dispatchTime = Time.time;
-		}
-		else {
-			++item;
 		}
 	}
 }

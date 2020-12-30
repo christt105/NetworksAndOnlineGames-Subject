@@ -2,8 +2,6 @@
 #include <list>
 // TODO(you): Reliability on top of UDP lab session
 
-#define TIME_OUT_PACKET 0.075
-
 class DeliveryManager;
 struct ClientProxy;
 struct Delivery;
