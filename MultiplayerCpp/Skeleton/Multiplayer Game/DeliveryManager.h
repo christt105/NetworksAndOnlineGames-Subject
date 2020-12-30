@@ -21,6 +21,17 @@ private:
 	ClientProxy* client = nullptr;
 };
 
+class OnSendPendingAck : public DeliveryDelegate {
+public:
+	OnSendPendingAck(const std::list<uint32>& pending, uint8 messageType, sockaddr_in addr) { this->pending = pending; this->messageType = messageType; this->addr = addr; }
+	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
+	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
+private:
+	std::list<uint32> pending;
+	uint8 messageType = 0;
+	sockaddr_in addr;
+};
+
 struct Delivery {
 	~Delivery() { if (delegate != nullptr) { delete delegate; } }
 	uint32 sequenceNumber = 0;
@@ -40,6 +51,7 @@ public:
 	
 	//For receivers to write ack'ed seq. numbers into a packet
 	bool hasSequenceNumbersPendingAck() const;
+	const std::list<uint32>& getPendingAck() const;
 	void writeSequenceNumbersPendingAck(OutputMemoryStream& packet);
 
 	//For senders to process ack'ed seq. numbers from a packet

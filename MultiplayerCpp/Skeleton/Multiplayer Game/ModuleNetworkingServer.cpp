@@ -303,6 +303,16 @@ void ModuleNetworkingServer::onUpdate()
 
 				// TODO(you): Reliability on top of UDP lab session
 				clientProxy.delivery_manager.processTimedoutPackets();
+
+				if (clientProxy.delivery_manager.hasSequenceNumbersPendingAck())
+				{
+					OutputMemoryStream packet;
+					packet << PROTOCOL_ID;
+					packet << ServerMessage::PendingAck;
+					clientProxy.delivery_manager.writeSequenceNumber(packet, new OnSendPendingAck(clientProxy.delivery_manager.getPendingAck(), (int)ServerMessage::PendingAck, clientProxy.address));
+					clientProxy.delivery_manager.writeSequenceNumbersPendingAck(packet);
+					sendPacket(packet, clientProxy.address);
+				}
 			}
 		}
 	}

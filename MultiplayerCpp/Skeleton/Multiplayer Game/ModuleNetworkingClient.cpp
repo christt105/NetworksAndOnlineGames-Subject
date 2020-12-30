@@ -264,6 +264,7 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::PendingAck;
+			delivery_manager.writeSequenceNumber(packet, new OnSendPendingAck(delivery_manager.getPendingAck(), (int)ClientMessage::PendingAck, serverAddress));
 			delivery_manager.writeSequenceNumbersPendingAck(packet);
 			sendPacket(packet, serverAddress);
 		}

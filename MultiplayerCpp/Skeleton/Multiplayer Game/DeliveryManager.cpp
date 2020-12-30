@@ -41,6 +41,11 @@ bool DeliveryManager::hasSequenceNumbersPendingAck() const
 	return !pendingSequenceNumbers.empty();
 }
 
+const std::list<uint32>& DeliveryManager::getPendingAck() const
+{
+	return pendingSequenceNumbers;
+}
+
 void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
 	for (auto item = pendingSequenceNumbers.begin(); item != pendingSequenceNumbers.end(); ++item) {
@@ -102,5 +107,20 @@ void OnChangeNetworkIDDelegate::onDeliveryFailure(DeliveryManager* deliveryManag
 		packet << ServerMessage::ChangeNetworkID;
 		packet << client->gameObject->networkId;
 		App->modNetServer->sendPacket(packet, client->address);
+	}
+}
+
+void OnSendPendingAck::onDeliveryFailure(DeliveryManager* deliveryManager)
+{
+	OutputMemoryStream packet;
+	packet << PROTOCOL_ID;
+	packet << messageType;
+	deliveryManager->writeSequenceNumber(packet);
+	deliveryManager->writeSequenceNumbersPendingAck(packet);
+	if (App->modNetClient != nullptr) {
+		App->modNetClient->sendPacket(packet, addr);
+	}
+	else if (App->modNetServer != nullptr) {
+		App->modNetServer->sendPacket(packet, addr);
 	}
 }

@@ -17,4 +17,5 @@ enum class ServerMessage : uint8
 	Replication,
 	Reliability,
 	ChangeNetworkID,
+	PendingAck
 };
