@@ -43,6 +43,10 @@ bool DeliveryManager::hasSequenceNumbersPendingAck() const
 
 void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
+	for (auto item = pendingSequenceNumbers.begin(); item != pendingSequenceNumbers.end(); ++item) {
+		packet << *item;
+	}
+	pendingSequenceNumbers.clear();
 }
 
 void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet)
