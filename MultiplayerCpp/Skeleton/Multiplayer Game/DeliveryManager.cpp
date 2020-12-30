@@ -47,6 +47,19 @@ void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 
 void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet)
 {
+	while (packet.RemainingByteCount() > 0) {
+		uint32 seq = 0U;
+		packet >> seq;
+
+		for (auto i = pendingDeliveries.begin(); i != pendingDeliveries.end(); ++i) {
+			if ((*i)->sequenceNumber == seq) {
+				(*i)->delegate->onDeliverySuccess(this);
+				pendingDeliveries.erase(i);
+				delete* i;
+				break;
+			}
+		}
+	}
 }
 
 void DeliveryManager::processTimedoutPackets()
