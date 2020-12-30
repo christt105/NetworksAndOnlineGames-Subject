@@ -285,8 +285,8 @@ void ModuleNetworkingServer::onUpdate()
 
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
-					clientProxy.delivery_manager.writeSequenceNumber(packet, new OnChangeNetworkIDDelegate(&clientProxy));
 					packet << ServerMessage::ChangeNetworkID;
+					clientProxy.delivery_manager.writeSequenceNumber(packet, new OnChangeNetworkIDDelegate(&clientProxy));
 					packet << clientProxy.gameObject->networkId;
 					sendPacket(packet, clientProxy.address);
 				}
@@ -297,7 +297,7 @@ void ModuleNetworkingServer::onUpdate()
 				sendPacket(packet, clientProxy.address);
 
 				// TODO(you): Reliability on top of UDP lab session
-				//clientProxy.delivery_manager.
+				clientProxy.delivery_manager.processTimedoutPackets();
 			}
 		}
 	}

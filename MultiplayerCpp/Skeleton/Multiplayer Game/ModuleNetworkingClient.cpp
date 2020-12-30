@@ -208,7 +208,7 @@ void ModuleNetworkingClient::onUpdate()
 		{
 			// Pack current input
 			uint32 currentInputData = inputDataBack++;
-			InputPacketData &inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
+			InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
 			inputPacketData.sequenceNumber = currentInputData;
 			inputPacketData.horizontalAxis = Input.horizontalAxis;
 			inputPacketData.verticalAxis = Input.verticalAxis;
@@ -230,7 +230,7 @@ void ModuleNetworkingClient::onUpdate()
 
 			for (uint32 i = inputDataFront; i < inputDataBack; ++i)
 			{
-				InputPacketData &inputPacketData = inputData[i % ArrayCount(inputData)];
+				InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 				packet << inputPacketData.sequenceNumber;
 				packet << inputPacketData.horizontalAxis;
 				packet << inputPacketData.verticalAxis;
@@ -246,7 +246,7 @@ void ModuleNetworkingClient::onUpdate()
 		// TODO(you): Latency management lab session
 
 		// Update camera for player
-		GameObject *playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+		GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 		if (playerGameObject != nullptr)
 		{
 			App->modRender->cameraPosition = playerGameObject->position;
@@ -256,6 +256,15 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::Respawn;
+			sendPacket(packet, serverAddress);
+		}
+
+		if (delivery_manager.hasSequenceNumbersPendingAck())
+		{
+			OutputMemoryStream packet;
+			packet << PROTOCOL_ID;
+			packet << ClientMessage::PendingAck;
+			delivery_manager.writeSequenceNumbersPendingAck(packet);
 			sendPacket(packet, serverAddress);
 		}
 	}
