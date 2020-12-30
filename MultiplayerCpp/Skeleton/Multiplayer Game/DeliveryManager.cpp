@@ -104,3 +104,14 @@ void OnChangeNetworkIDDelegate::onDeliveryFailure(DeliveryManager* deliveryManag
 		App->modNetServer->sendPacket(packet, client->address);
 	}
 }
+
+void WelcomeDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
+{
+	OutputMemoryStream welcomePacket;
+	welcomePacket << PROTOCOL_ID;
+	welcomePacket << ServerMessage::Welcome;
+	client->delivery_manager.writeSequenceNumber(welcomePacket, new WelcomeDelegate(client));
+	welcomePacket << client->clientId;
+	welcomePacket << client->gameObject->networkId;
+	App->modNetServer->sendPacket(welcomePacket, client->address);
+}

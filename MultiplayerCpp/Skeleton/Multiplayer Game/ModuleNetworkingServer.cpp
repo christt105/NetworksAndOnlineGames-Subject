@@ -147,6 +147,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				OutputMemoryStream welcomePacket;
 				welcomePacket << PROTOCOL_ID;
 				welcomePacket << ServerMessage::Welcome;
+				proxy->delivery_manager.writeSequenceNumber(welcomePacket, new WelcomeDelegate(proxy));
 				welcomePacket << proxy->clientId;
 				welcomePacket << proxy->gameObject->networkId;
 				sendPacket(welcomePacket, fromAddress);

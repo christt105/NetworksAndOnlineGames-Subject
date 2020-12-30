@@ -122,11 +122,13 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 
 		if (message == ServerMessage::Welcome)
 		{
-			packet >> playerId;
-			packet >> networkId;
+			if (delivery_manager.processSequenceNumber(packet)) {
+				packet >> playerId;
+				packet >> networkId;
 
-			LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
-			state = ClientState::Connected;
+				LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
+				state = ClientState::Connected;
+			}
 		}
 		else if (message == ServerMessage::Unwelcome)
 		{
@@ -154,7 +156,8 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			inputDataFront = i;
 			break; }
 		case ServerMessage::ChangeNetworkID: {
-			packet >> networkId;
+			if (delivery_manager.processSequenceNumber(packet))
+				packet >> networkId;
 			break; }
 		}
 	}

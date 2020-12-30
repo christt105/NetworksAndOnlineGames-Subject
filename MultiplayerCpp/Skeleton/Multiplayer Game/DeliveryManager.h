@@ -21,6 +21,16 @@ private:
 	ClientProxy* client = nullptr;
 };
 
+
+class WelcomeDelegate : public DeliveryDelegate {
+public:
+	WelcomeDelegate(ClientProxy* client) { this->client = client; }
+	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
+	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
+private:
+	ClientProxy* client = nullptr;
+};
+
 struct Delivery {
 	~Delivery() { if (delegate != nullptr) { delete delegate; } }
 	uint32 sequenceNumber = 0;
