@@ -3,7 +3,7 @@
 ## Members
 
 * [Christian Martínez de la Rosa](https://github.com/christt105)
-* [Oriol Capdevila Salinas Github](https://github.com/OriolCS2)
+* [Oriol Capdevila Salinas](https://github.com/OriolCS2)
 
 ## Spaceship Battle Royale
 
