@@ -77,6 +77,8 @@ GameObject * ModuleGameObject::Instantiate()
 
 void ModuleGameObject::Destroy(GameObject * gameObject)
 {
+	if (gameObject == nullptr)
+		return;
 	ASSERT(gameObject->networkId == 0); // NOTE(jesus): If it has a network identity, it must be destroyed by the Networking module first
 
 	static const GameObject::State gNextState[] = {

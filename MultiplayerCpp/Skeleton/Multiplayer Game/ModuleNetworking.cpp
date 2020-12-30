@@ -355,6 +355,8 @@ void ModuleNetworking::simulatedRealWorldConditions_EnqueuePacket(const InputMem
 		}
 
 		SimulatedPacket *simulatedPacket = freeSimulatedPackets;
+		if (simulatedPacket == nullptr)
+			return;
 		ASSERT(simulatedPacket != nullptr);
 		freeSimulatedPackets = simulatedPacket->next;
 

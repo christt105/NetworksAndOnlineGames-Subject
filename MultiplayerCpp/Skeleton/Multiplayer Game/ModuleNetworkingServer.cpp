@@ -144,12 +144,14 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 			if (proxy != nullptr)
 			{
 				// Send welcome to the new player
+				proxy->delivery_manager.clear();
 				OutputMemoryStream welcomePacket;
 				welcomePacket << PROTOCOL_ID;
 				welcomePacket << ServerMessage::Welcome;
-				proxy->delivery_manager.writeSequenceNumber(welcomePacket, new WelcomeDelegate(proxy));
+				auto del = proxy->delivery_manager.writeSequenceNumber(welcomePacket, new DeliveryDelegate(fromAddress, true));
 				welcomePacket << proxy->clientId;
 				welcomePacket << proxy->gameObject->networkId;
+				del->CopyPacket(welcomePacket);
 				sendPacket(welcomePacket, fromAddress);
 
 				// Send all network objects to the new player
@@ -292,8 +294,9 @@ void ModuleNetworkingServer::onUpdate()
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
 					packet << ServerMessage::ChangeNetworkID;
-					clientProxy.delivery_manager.writeSequenceNumber(packet, new OnChangeNetworkIDDelegate(&clientProxy));
+					auto del = clientProxy.delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(clientProxy.address, true));
 					packet << clientProxy.gameObject->networkId;
+					del->CopyPacket(packet);
 					sendPacket(packet, clientProxy.address);
 				}
 
@@ -310,8 +313,9 @@ void ModuleNetworkingServer::onUpdate()
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
 					packet << ServerMessage::PendingAck;
-					clientProxy.delivery_manager.writeSequenceNumber(packet, new OnSendPendingAck(clientProxy.delivery_manager.getPendingAck(), (int)ServerMessage::PendingAck, clientProxy.address));
+					auto del = clientProxy.delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(clientProxy.address, true));
 					clientProxy.delivery_manager.writeSequenceNumbersPendingAck(packet);
+					del->CopyPacket(packet);
 					sendPacket(packet, clientProxy.address);
 				}
 			}

@@ -191,6 +191,8 @@ void ModuleNetworkingClient::onUpdate()
 			packet << playerName;
 			packet << spaceshipType;
 
+			delivery_manager.clear();
+
 			sendPacket(packet, serverAddress);
 		}
 	}
@@ -265,7 +267,7 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::Respawn;
-			delivery_manager.writeSequenceNumber(packet, new RespawnDelegate(serverAddress));
+			delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(serverAddress, false))->CopyPacket(packet);
 			sendPacket(packet, serverAddress);
 		}
 
@@ -274,8 +276,9 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::PendingAck;
-			delivery_manager.writeSequenceNumber(packet, new OnSendPendingAck(delivery_manager.getPendingAck(), (int)ClientMessage::PendingAck, serverAddress));
+			auto del = delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(serverAddress, false));
 			delivery_manager.writeSequenceNumbersPendingAck(packet);
+			del->CopyPacket(packet);
 			sendPacket(packet, serverAddress);
 		}
 	}

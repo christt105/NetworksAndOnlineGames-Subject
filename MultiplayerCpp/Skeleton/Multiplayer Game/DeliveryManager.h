@@ -2,59 +2,31 @@
 #include <list>
 // TODO(you): Reliability on top of UDP lab session
 
+#define TIME_OUT_PACKET 0.075
+
 class DeliveryManager;
 struct ClientProxy;
+struct Delivery;
 
 class DeliveryDelegate {
 public:
+	DeliveryDelegate(sockaddr_in addr, bool isServer) : addr(addr), isServer(isServer) {};
 	virtual ~DeliveryDelegate() {}
-	virtual void onDeliverySuccess(DeliveryManager* deliveryManager) = 0;
-	virtual void onDeliveryFailure(DeliveryManager* deliveryManager) = 0;
-};
+	virtual void onDeliverySuccess(DeliveryManager* deliveryManager) {};
+	virtual void onDeliveryFailure(DeliveryManager* deliveryManager, Delivery* delivery);
 
-class OnChangeNetworkIDDelegate : public DeliveryDelegate {
 public:
-	OnChangeNetworkIDDelegate(ClientProxy* client) { this->client = client; }
-	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
-	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
-private:
-	ClientProxy* client = nullptr;
-};
-
-class OnSendPendingAck : public DeliveryDelegate {
-public:
-	OnSendPendingAck(const std::list<uint32>& pending, uint8 messageType, sockaddr_in addr) { this->pending = pending; this->messageType = messageType; this->addr = addr; }
-	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
-	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
-private:
-	std::list<uint32> pending;
-	uint8 messageType = 0;
-	sockaddr_in addr;
-};
-
-class WelcomeDelegate : public DeliveryDelegate {
-public:
-	WelcomeDelegate(ClientProxy* client) { this->client = client; }
-	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
-	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
-private:
-	ClientProxy* client = nullptr;
-};
-
-class RespawnDelegate : public DeliveryDelegate {
-public:
-	RespawnDelegate(sockaddr_in addr) { this->addr = addr; }
-	void onDeliverySuccess(DeliveryManager* deliveryManager) override {}
-	void onDeliveryFailure(DeliveryManager* deliveryManager) override;
-private:
+	bool isServer;
 	sockaddr_in addr;
 };
 
 struct Delivery {
 	~Delivery() { if (delegate != nullptr) { delete delegate; } }
+	void CopyPacket(const OutputMemoryStream& packet);
 	uint32 sequenceNumber = 0;
 	double dispatchTime = 0.0;
 	DeliveryDelegate* delegate = nullptr;
+	OutputMemoryStream packet;
 };
 
 class DeliveryManager {
@@ -62,7 +34,7 @@ public:
 	DeliveryManager() {}
 
 	//For senders to write a new seq. numbers into a packet
-	Delivery* writeSequenceNumber(OutputMemoryStream& packet, DeliveryDelegate* del = nullptr);
+	Delivery* writeSequenceNumber(OutputMemoryStream& packet, DeliveryDelegate* del);
 
 	//For receivers to process the seq. number from an incoming packet
 	bool processSequenceNumber(const InputMemoryStream& packet);

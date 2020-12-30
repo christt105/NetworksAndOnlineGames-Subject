@@ -11,7 +11,7 @@ Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet, Deliv
 	Delivery* ret = new Delivery();
 	ret->sequenceNumber = nextOutgoingSequenceNumber;
 	ret->dispatchTime = Time.time;
-	ret->delegate = del; // TODO
+	ret->delegate = del;
 
 	pendingDeliveries.push_back(ret);
 
@@ -26,12 +26,13 @@ bool DeliveryManager::processSequenceNumber(const InputMemoryStream& packet)
 
 	packet >> seq;
 
-	if (seq < nextExpectedSequenceNumber) {
+	if (seq != nextExpectedSequenceNumber) {
+		LOG("seq is %i and expected %i", seq, nextExpectedSequenceNumber);
 		return false;
 	}
 
 	pendingSequenceNumbers.push_back(seq);
-	nextExpectedSequenceNumber = seq + 1;
+	++nextExpectedSequenceNumber;
 
 	return true;
 }
@@ -76,11 +77,11 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 void DeliveryManager::processTimedoutPackets()
 {
 	for (auto item = pendingDeliveries.begin(); item != pendingDeliveries.end();) {
-		if ((*item)->dispatchTime + 5 < Time.time) {
+		if ((*item)->dispatchTime + TIME_OUT_PACKET < Time.time) {
 			if ((*item)->delegate != nullptr) {
-				(*item)->delegate->onDeliveryFailure(this);
+				(*item)->delegate->onDeliveryFailure(this, *item);
 			}
-			item = pendingDeliveries.erase(item);
+			(*item)->dispatchTime = Time.time;
 		}
 		else {
 			++item;
@@ -100,49 +101,17 @@ void DeliveryManager::clear()
 	pendingSequenceNumbers.clear();
 }
 
-void OnChangeNetworkIDDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
+void Delivery::CopyPacket(const OutputMemoryStream& packet)
 {
-	if (client->connected) {
-		OutputMemoryStream packet;
-		packet << PROTOCOL_ID;
-		client->delivery_manager.writeSequenceNumber(packet, new OnChangeNetworkIDDelegate(client));
-		packet << ServerMessage::ChangeNetworkID;
-		packet << client->gameObject->networkId;
-		App->modNetServer->sendPacket(packet, client->address);
-	}
+	this->packet = packet;
 }
 
-void OnSendPendingAck::onDeliveryFailure(DeliveryManager* deliveryManager)
+void DeliveryDelegate::onDeliveryFailure(DeliveryManager* deliveryManager, Delivery* del)
 {
-	OutputMemoryStream packet;
-	packet << PROTOCOL_ID;
-	packet << messageType;
-	deliveryManager->writeSequenceNumber(packet);
-	deliveryManager->writeSequenceNumbersPendingAck(packet);
-	if (App->modNetClient != nullptr) {
-		App->modNetClient->sendPacket(packet, addr);
+	if (isServer) {
+		App->modNetServer->sendPacket(del->packet, addr);
 	}
-	else if (App->modNetServer != nullptr) {
-		App->modNetServer->sendPacket(packet, addr);
+	else {
+		App->modNetClient->sendPacket(del->packet, addr);
 	}
-}
-
-void WelcomeDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
-{
-	OutputMemoryStream welcomePacket;
-	welcomePacket << PROTOCOL_ID;
-	welcomePacket << ServerMessage::Welcome;
-	client->delivery_manager.writeSequenceNumber(welcomePacket, new WelcomeDelegate(client));
-	welcomePacket << client->clientId;
-	welcomePacket << client->gameObject->networkId;
-	App->modNetServer->sendPacket(welcomePacket, client->address);
-}
-
-void RespawnDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
-{
-	OutputMemoryStream packet;
-	packet << PROTOCOL_ID;
-	packet << ClientMessage::Respawn;
-	deliveryManager->writeSequenceNumber(packet, new RespawnDelegate(addr));
-	App->modNetClient->sendPacket(packet, addr);
 }

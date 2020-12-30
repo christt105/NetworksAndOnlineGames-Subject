@@ -41,6 +41,8 @@ uint16 ModuleLinkingContext::getNetworkGameObjectsCount() const
 
 void ModuleLinkingContext::unregisterNetworkGameObject(GameObject *gameObject)
 {
+	if (gameObject == nullptr)
+		return;
 	networkGameObjectsMap.erase(gameObject->networkId);
 	gameObject->networkId = 0;
 }

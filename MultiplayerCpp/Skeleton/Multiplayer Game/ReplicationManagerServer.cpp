@@ -27,7 +27,7 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ClientProxy* pr
 {
 	packet << PROTOCOL_ID;
 	packet << ServerMessage::Replication;
-	proxy->delivery_manager.writeSequenceNumber(packet);
+	auto del = proxy->delivery_manager.writeSequenceNumber(packet, new DeliveryDelegate(proxy->address, true));
 	packet << actions.size();
 
 	for (auto item = actions.begin(); item != actions.end();) {
@@ -86,4 +86,5 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet, ClientProxy* pr
 		}
 		++item;
 	}
+	del->CopyPacket(packet);
 }
