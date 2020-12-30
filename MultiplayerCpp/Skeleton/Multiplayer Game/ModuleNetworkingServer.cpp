@@ -186,6 +186,11 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				proxy->deadTime = Time.time;
 			}
 		break; }
+		case ClientMessage::PendingAck: {
+			if (proxy != nullptr) {
+				proxy->delivery_manager.processAckdSequenceNumbers(packet);
+			}
+			break; }
 		case ClientMessage::Input:
 		{
 			// Process the input packet and update the corresponding game object
