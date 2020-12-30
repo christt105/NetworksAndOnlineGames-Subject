@@ -124,3 +124,14 @@ void OnSendPendingAck::onDeliveryFailure(DeliveryManager* deliveryManager)
 		App->modNetServer->sendPacket(packet, addr);
 	}
 }
+
+void WelcomeDelegate::onDeliveryFailure(DeliveryManager* deliveryManager)
+{
+	OutputMemoryStream welcomePacket;
+	welcomePacket << PROTOCOL_ID;
+	welcomePacket << ServerMessage::Welcome;
+	client->delivery_manager.writeSequenceNumber(welcomePacket, new WelcomeDelegate(client));
+	welcomePacket << client->clientId;
+	welcomePacket << client->gameObject->networkId;
+	App->modNetServer->sendPacket(welcomePacket, client->address);
+}
