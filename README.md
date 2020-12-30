@@ -31,11 +31,11 @@ Spaceship Battle royale is a multiplayer game where you control a spaceship and 
 
 ## Features
 
-* Replication Managers (Made by Christian and Oriol): 
-* Redundant sending of input packets to improve on packet loss ratios (Made by Christian): 
-* Delivery Manager (Made by Christian and Oriol): 
-* Music played on Clients (Made by Oriol): 
-* 4 powerups Effects (Made by Christian): 
-* Spawning PowerUps (Made by Oriol): 
-* Direction arrows of other players location (Made by Christian): 
-* Respawning Player On Dead (Made by Oriol): 
+* Replication Managers (Made by Christian and Oriol): 100% completed and we have not found any bugs
+* Redundant sending of input packets to improve on packet loss ratios (Made by Christian): 100% completed and we have not found any bugs
+* Delivery Manager (Made by Christian and Oriol): 100% completed and we have not found any bugs
+* Music played on Clients (Made by Oriol): All sounds are played on client
+* 4 powerups Effects (Made by Christian): The 4 powerups said before
+* Spawning PowerUps (Made by Oriol): When one spaceship is destroyed, a random powerup is spawned in the spaceship position
+* Direction arrows of other players location (Made by Christian): One arrow for every enemy spaceship pointing to its direction
+* Respawning Player On Dead (Made by Oriol): Once you are destroyed, you spawn 2s later losing the powerup.
