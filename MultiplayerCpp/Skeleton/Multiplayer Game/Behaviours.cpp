@@ -341,6 +341,7 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 	}
 }
 
+
 void Spaceship::write(OutputMemoryStream& packet)
 {
 	packet << hitPoints;

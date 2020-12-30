@@ -285,6 +285,7 @@ void ModuleNetworkingServer::onUpdate()
 
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
+					clientProxy.delivery_manager.writeSequenceNumber(packet, new OnChangeNetworkIDDelegate(&clientProxy));
 					packet << ServerMessage::ChangeNetworkID;
 					packet << clientProxy.gameObject->networkId;
 					sendPacket(packet, clientProxy.address);
@@ -296,6 +297,7 @@ void ModuleNetworkingServer::onUpdate()
 				sendPacket(packet, clientProxy.address);
 
 				// TODO(you): Reliability on top of UDP lab session
+				//clientProxy.delivery_manager.
 			}
 		}
 	}
@@ -339,7 +341,7 @@ void ModuleNetworkingServer::onDisconnect()
 // Client proxies
 //////////////////////////////////////////////////////////////////////
 
-ModuleNetworkingServer::ClientProxy * ModuleNetworkingServer::createClientProxy()
+ClientProxy * ModuleNetworkingServer::createClientProxy()
 {
 	// If it does not exist, pick an empty entry
 	for (int i = 0; i < MAX_CLIENTS; ++i)
@@ -353,7 +355,7 @@ ModuleNetworkingServer::ClientProxy * ModuleNetworkingServer::createClientProxy(
 	return nullptr;
 }
 
-ModuleNetworkingServer::ClientProxy * ModuleNetworkingServer::getClientProxy(const sockaddr_in &clientAddress)
+ClientProxy * ModuleNetworkingServer::getClientProxy(const sockaddr_in &clientAddress)
 {
 	// Try to find the client
 	for (int i = 0; i < MAX_CLIENTS; ++i)

@@ -2,6 +2,33 @@
 
 #include "ModuleNetworking.h"
 #include "ReplicationManagerServer.h"
+#include "DeliveryManager.h"
+
+struct ClientProxy
+{
+	bool connected = false;
+	sockaddr_in address;
+	uint32 clientId;
+	std::string name;
+	GameObject* gameObject = nullptr;
+
+	float deadTime = 0.0F;
+	bool respawning = false;
+
+	// TODO(you): UDP virtual connection lab session
+	float secondsSinceLastReceivedPacket = 0.f;
+	float secondsSinceLastPing = 0.f;
+
+	// TODO(you): World state replication lab session
+	ReplicationManagerServer replication_server;
+
+	// TODO(you): Reliability on top of UDP lab session
+
+	uint32 nextExpectedInputSequenceNumber = 0;
+	InputController gamepad;
+
+	DeliveryManager delivery_manager;
+};
 
 class ModuleNetworkingServer : public ModuleNetworking
 {
@@ -42,30 +69,6 @@ private:
 	//////////////////////////////////////////////////////////////////////
 
 	uint32 nextClientId = 0;
-
-	struct ClientProxy
-	{
-		bool connected = false;
-		sockaddr_in address;
-		uint32 clientId;
-		std::string name;
-		GameObject *gameObject = nullptr;
-
-		float deadTime = 0.0F;
-		bool respawning = false;
-
-		// TODO(you): UDP virtual connection lab session
-		float secondsSinceLastReceivedPacket = 0.f;
-		float secondsSinceLastPing = 0.f;
-		
-		// TODO(you): World state replication lab session
-		ReplicationManagerServer replication_server;
-
-		// TODO(you): Reliability on top of UDP lab session
-
-		uint32 nextExpectedInputSequenceNumber = 0;
-		InputController gamepad;
-	};
 
 	ClientProxy clientProxies[MAX_CLIENTS];
 
