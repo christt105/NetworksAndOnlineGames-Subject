@@ -62,9 +62,11 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 
 		for (auto i = pendingDeliveries.begin(); i != pendingDeliveries.end(); ++i) {
 			if ((*i)->sequenceNumber == seq) {
-				(*i)->delegate->onDeliverySuccess(this);
-				pendingDeliveries.erase(i);
+				if ((*i)->delegate != nullptr) {
+					(*i)->delegate->onDeliverySuccess(this);
+				}
 				delete* i;
+				pendingDeliveries.erase(i);
 				break;
 			}
 		}

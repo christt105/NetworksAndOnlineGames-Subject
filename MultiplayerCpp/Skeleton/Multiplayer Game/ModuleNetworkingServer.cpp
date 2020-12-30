@@ -164,7 +164,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				}
 
 				OutputMemoryStream packet;
-				proxy->replication_server.write(packet);
+				proxy->replication_server.write(packet, proxy);
 				sendPacket(packet, fromAddress);
 
 				LOG("Message received: hello - from player %s", proxy->name.c_str());
@@ -299,7 +299,7 @@ void ModuleNetworkingServer::onUpdate()
 
 				// TODO(you): World state replication lab session
 				OutputMemoryStream packet;
-				clientProxy.replication_server.write(packet);
+				clientProxy.replication_server.write(packet, &clientProxy);
 				sendPacket(packet, clientProxy.address);
 
 				// TODO(you): Reliability on top of UDP lab session

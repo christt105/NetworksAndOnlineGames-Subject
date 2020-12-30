@@ -144,7 +144,9 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		switch (message) {
 		case ServerMessage::Replication: {
 			// TODO(you): World state replication lab session
-			replication_client.read(packet);
+			if (delivery_manager.processSequenceNumber(packet)) {
+				replication_client.read(packet);
+			}	
 			break; }
 		case ServerMessage::Ping: {
 			//TODO:? why empty
